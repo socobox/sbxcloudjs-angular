@@ -1,0 +1,54 @@
+{
+  "compilerOptions": {
+    "baseUrl": "",
+    "declaration": true,
+    "stripInternal": true,
+    "experimentalDecorators": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "module": "es6",
+    "moduleResolution": "node",
+    "paths": {
+      "@angular/core": [
+        "node_modules/@angular/core"
+      ],
+      "@angular/common": [
+        "node_modules/@angular/common"
+      ],
+      "@angular/forms": [
+        "node_modules/@angular/forms"
+      ],
+      "rxjs/*": [
+        "node_modules/rxjs/*"
+      ]
+      ,
+      "sbx-querybuilder/*": [
+        "node_modules/sbx-querybuilder/*"
+      ],
+      "ngx-cookie-service/*": [
+        "node_modules/ngx-cookie-service/*"
+      ]
+    },
+//    "rootDir": "src",
+    "outDir": "dist",
+    "sourceMap": true,
+    "inlineSources": true,
+    "target": "es6",
+    "skipLibCheck": true,
+    "lib": [
+      "es6",
+      "dom"
+    ]
+  },
+  "files": [
+    "src/index.ts",
+    "sbx.d.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
+  "angularCompilerOptions": {
+    "strictMetadataEmit": true,
+    "genDir": ".tmp"
+  }
+}
