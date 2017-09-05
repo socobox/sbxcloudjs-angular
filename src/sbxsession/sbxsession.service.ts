@@ -15,8 +15,16 @@ export class SbxSessionService {
   private _user: User;
 
 
-  public ini(domain: number, apiPath: string, appkey: string) {
-    this.core.ini(domain, apiPath, appkey);
+  public initialize(domain: number, base_url: string, appkey: string) {
+    this.core.initialize(domain, base_url, appkey);
+  }
+
+  /**
+   * Initialize service with environment
+   * @param environment (domain, base_url, appkey)
+   */
+  public initializeWithEnvironment(environment: any) {
+    this.core.initialize(environment.domain, environment.base_url, environment.appkey);
   }
   /**
    * General User methods

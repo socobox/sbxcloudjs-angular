@@ -34,9 +34,9 @@ export class SbxCoreService {
   }
 
 
-  public ini(domain: number, apiPath: string, appkey: string) {
+  public initialize(domain: number, base_url: string, appkey: string) {
     SbxCoreService.environment.domain = domain;
-    SbxCoreService.environment.base_url = apiPath;
+    SbxCoreService.environment.base_url = base_url;
     SbxCoreService.environment.appkey = appkey;
     this.headers = new HttpHeaders()
       .set('App-Key', SbxCoreService.environment.appkey);
