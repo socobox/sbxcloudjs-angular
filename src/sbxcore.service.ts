@@ -34,12 +34,12 @@ export class SbxCoreService {
   }
 
 
-  public initialize(domain: number, base_url: string, appkey: string) {
+  public initialize(domain: number, baseUrl: string, appKey: string) {
     SbxCoreService.environment.domain = domain;
-    SbxCoreService.environment.base_url = base_url;
-    SbxCoreService.environment.appkey = appkey;
+    SbxCoreService.environment.baseUrl = baseUrl;
+    SbxCoreService.environment.appKey = appKey;
     this.headers = new HttpHeaders()
-      .set('App-Key', SbxCoreService.environment.appkey);
+      .set('App-Key', SbxCoreService.environment.appKey);
   }
   public addHeaderAttr(name: string, value: string): void {
     this.headers = this.getHeaders().set(name, value);
@@ -58,7 +58,7 @@ export class SbxCoreService {
   }
 
   $p(path: string) {
-    return SbxCoreService.environment.base_url + path;
+    return SbxCoreService.environment.baseUrl + path;
   }
 
   /**
