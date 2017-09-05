@@ -515,59 +515,121 @@ export class Find {
     return  this;
   }
 
+  /**
+   * @param {string} field
+   * @param value
+   * @return {Find}
+   */
   public whereIsEqual(field: string, value: any) {
     this.query.addCondition(this.lastANDOR, field, '=', value);
     return this;
   }
 
+  /**
+   * @param {string} field
+   * @return {Find}
+   */
   public whereIsNotNull(field: string) {
     this.query.addCondition(this.lastANDOR, field, 'IS NOT', null);
     return this;
   }
 
+  /**
+   * @param {string} field
+   * @return {Find}
+   */
   public whereIsNull(field: string) {
     this.query.addCondition(this.lastANDOR, field, 'IS', null);
     return this;
   }
 
+  /**
+   * @param {string} field
+   * @param value
+   * @return {Find}
+   */
   public whereGreaterThan(field: string, value: any) {
     this.query.addCondition(this.lastANDOR, field, '>', value);
     return this;
   }
 
+  /**
+   * @param {string} field
+   * @param value
+   * @return {Find}
+   */
   public whereLessThan(field: string, value: any) {
     this.query.addCondition(this.lastANDOR, field, '<', value);
     return this;
   }
 
+  /**
+   * @param {string} field
+   * @param value
+   * @return {Find}
+   */
   public whereGreaterOrEqualThan(field: string, value: any) {
     this.query.addCondition(this.lastANDOR, field, '>=', value);
     return this;
   }
 
+  /**
+   * @param {string} field
+   * @param value
+   * @return {Find}
+   */
   public whereLessOrEqualThan(field: string, value: any) {
     this.query.addCondition(this.lastANDOR, field, '<=', value);
     return this;
   }
 
+  /**
+   * @param {string} field
+   * @param value
+   * @return {Find}
+   */
   public whereIsNotEqual(field: string, value: any) {
     this.query.addCondition(this.lastANDOR, field, '!=', value);
     return this;
   }
 
+  /**
+   * @param {string} field
+   * @param value
+   * @return {Find}
+   */
   public whereLike(field: string, value: any) {
     this.query.addCondition(this.lastANDOR, field, 'LIKE', value);
     return this;
   }
 
+  /**
+   * @param {string} field
+   * @param value
+   * @return {Find}
+   */
   public whereIn(field: string, value: any) {
     this.query.addCondition(this.lastANDOR, field, 'IN', value);
     return this;
   }
 
+  /**
+   * @param {string} field
+   * @param value
+   * @return {Find}
+   */
   public whereNotIn(field: string, value: any) {
     this.query.addCondition(this.lastANDOR, field, 'NOT IN', value);
     return this;
+  }
+
+  /**
+   * Reference Join between two model
+   * @param {string} field column name of principal model
+   * @param {string} referenceField column name of subQuery
+   */
+  public whereReferenceJoinBetween(field: string, referenceField: string) {
+    return new ReferenceJoin(this, field, referenceField);
   }
 
   public whereWithKeys(keys) {
@@ -674,3 +736,162 @@ export class Find {
     }}
 }
 
+export class ReferenceJoin {
+
+  private find: Find;
+  private field: string;
+  private referenceField: string;
+
+  constructor(find: Find, field: string, referenceField: string) {
+    this.find = find;
+    this.field = field;
+    this.referenceField = referenceField;
+    this.find.whereIn(this.field, '@reference_join@');
+  }
+
+  /**
+   * set model to Join
+   * @param {string} referenceModel
+   * @return {FilterJoin}
+   */
+  public in(referenceModel: string) {
+    return new FilterJoin(this.find, this.field, this.referenceField, referenceModel);
+  }
+}
+
+
+export class FilterJoin {
+
+  private find: Find;
+  private field: string;
+  private referenceField: string;
+  private referenceModel: string;
+
+
+  constructor(find: Find, field: string, referenceField: string, referenceModel: string) {
+    this.find = find;
+    this.field = field;
+    this.referenceField = referenceField;
+    this.referenceModel = referenceModel;
+    this.find.whereIn(this.field, '@reference_join@');
+  }
+
+  /**
+   * @param {string} field
+   * @param value
+   * @return {Find}
+   */
+  public filterWhereIsEqual(field: string, value: any) {
+    this.find.query.setReferenceJoin('=', this.field, this.referenceField, this.referenceModel, value);
+    return this.find;
+  }
+
+  /**
+   * @param {string} field
+   * @return {Find}
+   * @constructor
+   */
+  public FilterWhereIsNotNull(field: string) {
+    this.find.query.setReferenceJoin('IS NOT', this.field, this.referenceField, this.referenceModel, null);
+    return this.find;
+  }
+
+  /**
+   * @param {string} field
+   * @return {Find}
+   * @constructor
+   */
+  public FilterWhereIsNull(field: string) {
+    this.find.query.setReferenceJoin('IS', this.field, this.referenceField, this.referenceModel, null);
+    return this.find;
+  }
+
+  /**
+   * @param {string} field
+   * @param value
+   * @return {Find}
+   * @constructor
+   */
+  public FilterWhereGreaterThan(field: string, value: any) {
+    this.find.query.setReferenceJoin('>', this.field, this.referenceField, this.referenceModel, value);
+    return this.find;
+  }
+
+  /**
+   * @param {string} field
+   * @param value
+   * @return {Find}
+   * @constructor
+   */
+  public FilterWhereLessThan(field: string, value: any) {
+    this.find.query.setReferenceJoin('<', this.field, this.referenceField, this.referenceModel, value);
+    return this.find;
+  }
+
+  /**
+   * @param {string} field
+   * @param value
+   * @return {Find}
+   * @constructor
+   */
+  public FilterWhereGreaterOrEqualThan(field: string, value: any) {
+    this.find.query.setReferenceJoin('>=', this.field, this.referenceField, this.referenceModel, value);
+    return this.find;
+  }
+
+  /**
+   * @param {string} field
+   * @param value
+   * @return {Find}
+   * @constructor
+   */
+  public FilterWhereLessOrEqualThan(field: string, value: any) {
+    this.find.query.setReferenceJoin('<=', this.field, this.referenceField, this.referenceModel, value);
+    return this.find;
+  }
+
+  /**
+   * @param {string} field
+   * @param value
+   * @return {Find}
+   * @constructor
+   */
+  public FilterWhereIsNotEqual(field: string, value: any) {
+    this.find.query.setReferenceJoin('!=', this.field, this.referenceField, this.referenceModel, value);
+    return this.find;
+  }
+
+  /**
+   * @param {string} field
+   * @param value
+   * @return {Find}
+   * @constructor
+   */
+  public FilterWhereLike(field: string, value: any) {
+    this.find.query.setReferenceJoin('LIKE', this.field, this.referenceField, this.referenceModel, value);
+    return this.find;
+  }
+
+  /**
+   * @param {string} field
+   * @param value
+   * @return {Find}
+   * @constructor
+   */
+  public FilterWhereIn(field: string, value: any) {
+    this.find.query.setReferenceJoin('IN', this.field, this.referenceField, this.referenceModel, value);
+    return this.find;
+  }
+
+  /**
+   * @param {string} field
+   * @param value
+   * @return {Find}
+   * @constructor
+   */
+  public FilterWhereNotIn(field: string, value: any) {
+    this.find.query.setReferenceJoin('NOT IN', this.field, this.referenceField, this.referenceModel, value);
+    return this.find;
+  }
+
+}
