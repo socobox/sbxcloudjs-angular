@@ -14,6 +14,7 @@ export class SbxCoreService {
     update_password: '/user/v1/password',
     login: '/user/v1/login',
     register: '/user/v1/register',
+    validate: '/user/v1/validate',
     row: '/data/v1/row',
     find: '/data/v1/row/find',
     update: '/data/v1/row/update',
@@ -74,6 +75,26 @@ export class SbxCoreService {
     const httpParams = new HttpParams().set('login', login).set('password', password);
     const option = {headers: this.getHeadersJSON(), params: httpParams};
     this.observableToCallBack(this.httpClient.get(this.$p(this.urls.login), option), callBack);
+  }
+
+  /**
+   * @param {string} token
+   * @param {Callback} callBack
+   */
+  validate(token: string,  callBack: Callback) {
+    const httpParams = new HttpParams().set('token', token) ;
+    const option = {headers: this.getHeadersJSON(), params: httpParams};
+    this.observableToCallBack(this.httpClient.get(this.$p(this.urls.validate), option), callBack);
+  }
+
+  /**
+   * @param {string} token
+   * @return {Observable<any>}
+   */
+  validateRx(token: string) {
+    const httpParams = new HttpParams().set('token', token) ;
+    const option = {headers: this.getHeadersJSON(), params: httpParams};
+     return this.httpClient.get(this.$p(this.urls.validate), option).map(data => data as any) ;
   }
 
   /**

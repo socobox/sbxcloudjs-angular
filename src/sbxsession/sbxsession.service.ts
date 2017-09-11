@@ -17,6 +17,7 @@ export class SbxSessionService {
 
   public initialize(domain: number, baseUrl: string, appKey: string) {
     this.core.initialize(domain, baseUrl, appKey);
+    this.islogged();
   }
 
   /**
@@ -25,7 +26,9 @@ export class SbxSessionService {
    */
   public initializeWithEnvironment(environment: any) {
     this.core.initialize(environment.domain, environment.baseUrl, environment.appKey);
+    this.islogged();
   }
+
   /**
    * General User methods
    */
@@ -59,12 +62,12 @@ export class SbxSessionService {
   }
 
   private updateUser(data: any) {
+    this.updateCookieToken(data.token);
+    this.core.addHeaderAttr('Authorization', 'Bearer ' + data.token);
     this.getCurrentUser().id = data.user.id;
     this.getCurrentUser().name = data.user.name;
     this.getCurrentUser().login = data.user.login;
     this.getCurrentUser().email = data.user.email;
-    this.updateCookieToken(data.token);
-    this.core.addHeaderAttr('Authorization', 'Bearer ' + data.token);
   }
   /**
    * Auth user methods
@@ -88,6 +91,29 @@ export class SbxSessionService {
           this.updateUser(data);
         }
           return data;
+      });
+  }
+
+  validate(token: string, callBack: Callback): void {
+    this.core.validate(token, new Callback(
+      data => {
+        if (data.success) {
+          data.token = token;
+          this.updateUser(data);
+        }
+        callBack.ok(data);
+      }, callBack.error));
+
+  }
+
+  validateRx(token: string ) {
+    return this.core.validateRx(token)
+      .map(data => {
+        if (data.success) {
+          data.token = token;
+          this.updateUser(data);
+        }
+        return data;
       });
   }
 
