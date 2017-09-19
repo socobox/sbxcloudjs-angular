@@ -319,7 +319,7 @@ export class SbxCoreService {
     const input = new FormData();
     input.append('file', file);
     input.append('model', JSON.stringify({ key: key}));
-    const option = {headers: this.getHeadersJSON() };
+    const option = {headers: this.getHeaders() };
     return this.httpClient.post(this.$p(this.urls.uploadFile), input, option).map(res => res as any);
   }
 
@@ -333,7 +333,7 @@ export class SbxCoreService {
     const input = new FormData();
     input.append('file', file);
     input.append('model', JSON.stringify({ key: key}));
-    const option = {headers: this.getHeadersJSON() };
+    const option = {headers: this.getHeaders() };
     this.observableToCallBack(this.httpClient.post(this.$p(this.urls.uploadFile), input, option), callBack);
   }
 
