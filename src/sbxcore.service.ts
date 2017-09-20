@@ -91,7 +91,7 @@ export class SbxCoreService {
    * @param {string} token
    * @return {Observable<any>}
    */
-  validateRx(token: string) {
+  validateRx(token: string): Observable<any> {
     const httpParams = new HttpParams().set('token', token) ;
     const option = {headers: this.getHeadersJSON(), params: httpParams};
      return this.httpClient.get(this.$p(this.urls.validate), option).map(data => data as any) ;
@@ -120,7 +120,7 @@ export class SbxCoreService {
    * @param {string} password
    * @return {Observable<any>}
    */
-  loginRx(login: string, password: string) {
+  loginRx(login: string, password: string): Observable<any> {
     const httpParams = new HttpParams().set('login', login).set('password', password);
     const option = {headers: this.getHeadersJSON(), params: httpParams};
     return   this.httpClient.get(this.$p(this.urls.login), option).map(data => data as any);
@@ -133,7 +133,7 @@ export class SbxCoreService {
    * @param {string} password
    * @return {Observable<any>}
    */
-  signUpRx(login: string, email: string, name: string, password: string) {
+  signUpRx(login: string, email: string, name: string, password: string): Observable<any> {
     const httpParams = new HttpParams().set('login', login)
       .set('password', password)
       .set('name', name)
@@ -163,7 +163,7 @@ export class SbxCoreService {
    * @param {string} emailTemplate
    * @return {Observable<Object>}
    */
-  sendPasswordRequestRx(useEmail: string, subject: string, emailTemplate: string) {
+  sendPasswordRequestRx(useEmail: string, subject: string, emailTemplate: string): Observable<any> {
     const body =  {user_email: useEmail, domain: SbxCoreService.environment.domain, subject: subject, email_template: emailTemplate};
     const option = {headers: this.getHeadersJSON() };
     return this.httpClient.post(this.$p(this.urls.password), body, option).map( data => data as any);
@@ -189,7 +189,7 @@ export class SbxCoreService {
    * @param {string} newPassword
    * @return {Observable<Object>}
    */
-  changePasswordRx(userId: number, userCode: number, newPassword: string) {
+  changePasswordRx(userId: number, userCode: number, newPassword: string): Observable<any> {
     const body =  {domain: SbxCoreService.environment.domain, user_id: userId, code: userCode, password: newPassword};
     const option = {headers: this.getHeadersJSON() };
     return this.httpClient.put(this.$p(this.urls.password), body, option).map(data => data as any);
@@ -227,7 +227,7 @@ export class SbxCoreService {
    * @param data can be a JSON, or TypeScript Class or Array of both
    * @return {Observable}
    */
-  insertRx(model: string, data: any) {
+  insertRx(model: string, data: any): Observable<any> {
     const body = this.queryBuilderToInsert(data).setModel(model).compile();
     const option = {headers: this.getHeadersJSON() };
     return this.httpClient.post(this.$p(this.urls.row), body, option).map(res => res as any);
@@ -238,7 +238,7 @@ export class SbxCoreService {
    * @param data can be a JSON, or TypeScript Class or Array of both
    * @return {Observable}
    */
-  updateRx(model: string, data: any) {
+  updateRx(model: string, data: any): Observable<any> {
     const body = this.queryBuilderToInsert(data).setModel(model).compile();
     const option = {headers: this.getHeadersJSON() };
     return this.httpClient.post(this.$p(this.urls.update), body, option).map(res => res as any);
@@ -293,7 +293,7 @@ export class SbxCoreService {
    * @param {boolean} isTemplate
    * @return {Observable<any>}
    */
-  sendEmailRx(subject: string, to: string, from: string, body: string, isTemplate: boolean) {
+  sendEmailRx(subject: string, to: string, from: string, body: string, isTemplate: boolean): Observable<any> {
     const mail = {
       subject: subject,
       to: to,
@@ -315,7 +315,7 @@ export class SbxCoreService {
    * @param file
    * @return {Observable<any>}
    */
-  uploadFileRx(key: string, file: any) {
+  uploadFileRx(key: string, file: any): Observable<any> {
     const input = new FormData();
     input.append('file', file);
     input.append('model', JSON.stringify({ key: key}));
@@ -347,7 +347,7 @@ export class SbxCoreService {
    * @param params
    * @return {Observable<any>}
    */
-  runRx(key: string, params: any) {
+  runRx(key: string, params: any): Observable<any> {
     const option = {headers: this.getHeadersJSON() };
     return this.httpClient.post(this.$p(this.urls.cloudscript_run), { key: key, params: params }, option).map(res => res as any);
   }
@@ -803,7 +803,7 @@ export class Find {
       (query == null) ? this.query.compile() : query, option), callBack);
   }
 
-  public thenRx(query?: any) {
+  public thenRx(query?: any): Observable<any> {
     const option = {headers: this.core.getHeadersJSON() };
     return this.core.httpClient.post(this.isFind ? this.core.$p(this.core.urls.find) : this.core.$p(this.core.urls.delete),
       (query == null) ? this.query.compile() : query, option).map(res => res as any);
