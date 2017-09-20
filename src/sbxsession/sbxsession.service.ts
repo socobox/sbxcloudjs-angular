@@ -6,7 +6,7 @@ import {Observable} from 'rxjs/Rx';
 @Injectable()
 export class SbxSessionService {
 
-  constructor(private core: SbxCoreService, private cookieService: CookieService) {
+  constructor(private sbxCoreService: SbxCoreService, private cookieService: CookieService) {
   }
 
   private static day = 86400000;
@@ -16,7 +16,7 @@ export class SbxSessionService {
 
 
   public initialize(domain: number, baseUrl: string, appKey: string) {
-    this.core.initialize(domain, baseUrl, appKey);
+    this.sbxCoreService.initialize(domain, baseUrl, appKey);
     this.islogged();
   }
 
@@ -25,7 +25,7 @@ export class SbxSessionService {
    * @param environment (domain, base_url, appkey)
    */
   public initializeWithEnvironment(environment: any) {
-    this.core.initialize(environment.domain, environment.baseUrl, environment.appKey);
+    this.sbxCoreService.initialize(environment.domain, environment.baseUrl, environment.appKey);
     this.islogged();
   }
 
@@ -40,7 +40,7 @@ export class SbxSessionService {
   islogged(): boolean {
     this.loadCookieToken();
     if (this.getCurrentUser().token != null) {
-      this.core.addHeaderAttr('Authorization', 'Bearer ' + this.getCurrentUser().token);
+      this.sbxCoreService.addHeaderAttr('Authorization', 'Bearer ' + this.getCurrentUser().token);
       return true;
     } else {
       return false;
@@ -63,7 +63,7 @@ export class SbxSessionService {
 
   private updateUser(data: any) {
     this.updateCookieToken(data.token);
-    this.core.addHeaderAttr('Authorization', 'Bearer ' + data.token);
+    this.sbxCoreService.addHeaderAttr('Authorization', 'Bearer ' + data.token);
     this.getCurrentUser().id = data.user.id;
     this.getCurrentUser().name = data.user.name;
     this.getCurrentUser().login = data.user.login;
@@ -74,7 +74,7 @@ export class SbxSessionService {
    */
 
   login(login: string, password: string, callBack: Callback): void {
-    this.core.login(login,
+    this.sbxCoreService.login(login,
       password, new Callback(
         data => {
           if (data.success) {
@@ -85,7 +85,7 @@ export class SbxSessionService {
   }
 
   loginRx(login: string, password: string) {
-    return this.core.loginRx(login, password)
+    return this.sbxCoreService.loginRx(login, password)
       .map(data => {
         if (data.success) {
           this.updateUser(data);
@@ -95,7 +95,7 @@ export class SbxSessionService {
   }
 
   validate(token: string, callBack: Callback): void {
-    this.core.validate(token, new Callback(
+    this.sbxCoreService.validate(token, new Callback(
       data => {
         if (data.success) {
           data.token = token;
@@ -107,7 +107,7 @@ export class SbxSessionService {
   }
 
   validateRx(token: string ) {
-    return this.core.validateRx(token)
+    return this.sbxCoreService.validateRx(token)
       .map(data => {
         if (data.success) {
           data.token = token;
@@ -119,12 +119,12 @@ export class SbxSessionService {
 
   logout(): void {
     this.cookieService.delete(this.cookieToken);
-    this.core.removeHeaderAttr('Authorization');
+    this.sbxCoreService.removeHeaderAttr('Authorization');
     this._user = null;
   }
 
   signUp(login: string, email: string, name: string, password: string, callBack: Callback): void {
-    this.core.signUp(login, email,
+    this.sbxCoreService.signUp(login, email,
       name,
       password, new Callback(
         data => {
@@ -136,7 +136,7 @@ export class SbxSessionService {
   }
 
   signUpRx(login: string, email: string, name: string, password: string) {
-    return this.core.signUpRx(login, email, name, password)
+    return this.sbxCoreService.signUpRx(login, email, name, password)
       .map(data => {
         if (data.success) {
           this.updateUser(data);
