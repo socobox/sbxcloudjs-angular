@@ -56,18 +56,21 @@ export class SbxSessionService {
   }
 
   public updateCookieToken(token: string): void {
-    this.getCurrentUser().token = token;
     const today = new Date().getTime();
     this.cookieService.set(this.cookieToken, token, new Date(today + this.daysToExpire * SbxSessionService.day));
   }
 
+
+
   private updateUser(data: any) {
-    this.sbxCoreService.addHeaderAttr('Authorization', 'Bearer ' + data.token);
+    this.getCurrentUser().token = data.token
     this.getCurrentUser().id = data.user.id;
     this.getCurrentUser().name = data.user.name;
     this.getCurrentUser().login = data.user.login;
     this.getCurrentUser().email = data.user.email;
+    this.sbxCoreService.addHeaderAttr('Authorization', 'Bearer ' + data.token);
   }
+
   /**
    * Auth user methods
    */
