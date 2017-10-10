@@ -19,6 +19,7 @@ export class SbxCoreService {
     find: '/data/v1/row/find',
     update: '/data/v1/row/update',
     delete: '/data/v1/row/delete',
+    downloadFile: '/content/v1/download',
     uploadFile: '/content/v1/upload',
     addFolder: '/content/v1/folder',
     folderList: '/content/v1/folder',
@@ -364,6 +365,29 @@ export class SbxCoreService {
     const option = {headers: this.getHeaders() };
     this.observableToCallBack(this.httpClient.post(this.$p(this.urls.uploadFile), input, option), callBack);
   }
+
+  /**
+   * @param {string} key
+   * @return {Observable<any>}
+   */
+  downloadFileRx(key: string): Observable<any> {
+    const httpParams = new HttpParams().set('action', 'download').set('key', key);
+    const option = {headers: this.getHeaders(), params: httpParams };
+    return this.httpClient.get(this.$p(this.urls.downloadFile), option).map(res => res as any);
+  }
+
+  /**
+   *
+   * @param {string} key
+   * @param {Callback} callBack
+   */
+  downloadFile(key: string, callBack: Callback) {
+    const httpParams = new HttpParams().set('action', 'download').set('key', key);
+    const option = {headers: this.getHeaders(), params: httpParams };
+    this.observableToCallBack(this.httpClient.get(this.$p(this.urls.downloadFile), option), callBack);
+  }
+
+
 
   /**
    * CLOUDSCRIPT
