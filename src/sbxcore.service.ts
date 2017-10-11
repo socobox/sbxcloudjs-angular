@@ -73,7 +73,7 @@ export class SbxCoreService {
    * @param {Callback} callBack
    */
   login(login: string, password: string, callBack: Callback) {
-    const httpParams = new HttpParams().set('login', login).set('password', password);
+    const httpParams = new HttpParams().set('login', this.encodeEmails(login)).set('password', password);
     const option = {headers: this.getHeadersJSON(), params: httpParams};
     this.observableToCallBack(this.httpClient.get(this.$p(this.urls.login), option), callBack);
   }
@@ -98,6 +98,10 @@ export class SbxCoreService {
      return this.httpClient.get(this.$p(this.urls.validate), option).map(data => data as any) ;
   }
 
+  private encodeEmails(email: string) {
+    return email.replace('+', '%2B');
+  }
+
   /**
    *
    * @param {string} login
@@ -107,11 +111,11 @@ export class SbxCoreService {
    * @param {Callback} callBack
    */
   signUp(login: string, email: string, name: string, password: string, callBack: Callback) {
-    const httpParams = new HttpParams().set('login', login)
+    const httpParams = new HttpParams().set('login', this.encodeEmails(login))
       .set('password', password)
       .set('name', name)
       .set('domain', SbxCoreService.environment.domain.toLocaleString())
-      .set('email', email);
+      .set('email', this.encodeEmails(email));
     const option = {headers: this.getHeadersJSON(), params: httpParams};
     this.observableToCallBack(this.httpClient.get(this.$p(this.urls.register), option), callBack);
   }
@@ -122,7 +126,7 @@ export class SbxCoreService {
    * @return {Observable<any>}
    */
   loginRx(login: string, password: string): Observable<any> {
-    const httpParams = new HttpParams().set('login', login).set('password', password);
+    const httpParams = new HttpParams().set('login', this.encodeEmails(login)).set('password', password);
     const option = {headers: this.getHeadersJSON(), params: httpParams};
     return   this.httpClient.get(this.$p(this.urls.login), option).map(data => data as any);
   }
@@ -135,37 +139,39 @@ export class SbxCoreService {
    * @return {Observable<any>}
    */
   signUpRx(login: string, email: string, name: string, password: string): Observable<any> {
-    const httpParams = new HttpParams().set('login', login)
+    const httpParams = new HttpParams().set('login', this.encodeEmails(login))
       .set('password', password)
       .set('name', name)
       .set('domain', SbxCoreService.environment.domain.toLocaleString())
-      .set('email', email);
+      .set('email', this.encodeEmails(email));
     const option = {headers: this.getHeadersJSON(), params: httpParams};
     return this.httpClient.get(this.$p(this.urls.register), option).map(data => data as any);
   }
 
   /**
    * Send email to changePassword
-   * @param {string} useEmail
+   * @param {string} userEmail
    * @param {string} subject
    * @param {string} emailTemplate
    * @param {Callback} callBack
    */
-  sendPasswordRequest(useEmail: string, subject: string, emailTemplate: string, callBack: Callback) {
-    const body =  {user_email: useEmail, domain: SbxCoreService.environment.domain, subject: subject, email_template: emailTemplate};
+  sendPasswordRequest(userEmail: string, subject: string, emailTemplate: string, callBack: Callback) {
+    const body =  {user_email: this.encodeEmails(userEmail),
+      domain: SbxCoreService.environment.domain, subject: subject, email_template: emailTemplate};
     const option = {headers: this.getHeadersJSON() };
     this.observableToCallBack(this.httpClient.post(this.$p(this.urls.password), body, option), callBack);
   }
 
   /**
    * Send email to changePassword
-   * @param {string} useEmail
+   * @param {string} userEmail
    * @param {string} subject
    * @param {string} emailTemplate
    * @return {Observable<Object>}
    */
-  sendPasswordRequestRx(useEmail: string, subject: string, emailTemplate: string): Observable<any> {
-    const body =  {user_email: useEmail, domain: SbxCoreService.environment.domain, subject: subject, email_template: emailTemplate};
+  sendPasswordRequestRx(userEmail: string, subject: string, emailTemplate: string): Observable<any> {
+    const body =  {user_email: this.encodeEmails(userEmail),
+      domain: SbxCoreService.environment.domain, subject: subject, email_template: emailTemplate};
     const option = {headers: this.getHeadersJSON() };
     return this.httpClient.post(this.$p(this.urls.password), body, option).map( data => data as any);
   }
