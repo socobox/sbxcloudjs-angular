@@ -346,6 +346,47 @@ export class SbxCoreService {
 
 
   /**
+   * @param data
+   * @param {Callback} callBack
+   */
+  paymentCustomer(data: Object, callBack: Callback) {
+    data['domain'] = SbxCoreService.environment.domain;
+    const option = {headers: this.getHeadersJSON() };
+    this.observableToCallBack(this.httpClient.post(this.$p(this.urls.payment_customer), data, option), callBack);
+  }
+
+  /**
+   * @param data
+   * @return {Observable<any>}
+   */
+  paymentCustomerRx(data: Object): Observable<any> {
+    data['domain'] = SbxCoreService.environment.domain;
+    const option = {headers: this.getHeadersJSON() };
+    return this.httpClient.post(this.$p(this.urls.payment_customer), data, option).map(res => res as any);
+  }
+
+  /**
+   * @param data
+   * @param {Callback} callBack
+   */
+  paymentCard(data: Object, callBack: Callback) {
+    data['domain'] = SbxCoreService.environment.domain;
+    const option = {headers: this.getHeadersJSON() };
+    this.observableToCallBack(this.httpClient.post(this.$p(this.urls.payment_card), data, option), callBack);
+  }
+
+  /**
+   * @param data
+   * @return {Observable<any>}
+   */
+  paymentCardRx(data: Object): Observable<any> {
+    data['domain'] = SbxCoreService.environment.domain;
+    const option = {headers: this.getHeadersJSON() };
+    return this.httpClient.post(this.$p(this.urls.payment_card), data, option).map(res => res as any);
+  }
+
+
+  /**
    * @param {string} key
    * @param file
    * @return {Observable<any>}
