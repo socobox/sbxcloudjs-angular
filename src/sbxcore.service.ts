@@ -717,9 +717,32 @@ export class Find {
    * @param value
    * @return {Find}
    */
-  public andWhereLike(field: string, value: any) {
+  public andWhereStartsWith(field: string, value: string) {
     this.lastANDOR = 'AND';
-    this.query.addCondition(this.lastANDOR, field, 'LIKE', value);
+    this.query.addCondition(this.lastANDOR, field, 'LIKE', `%${value}`);
+    return this;
+  }
+
+
+  /**
+   * @param {string} field
+   * @param value
+   * @return {Find}
+   */
+  public andWhereEndsWith(field: string, value: string) {
+    this.lastANDOR = 'AND';
+    this.query.addCondition(this.lastANDOR, field, 'LIKE', `${value}%`);
+    return this;
+  }
+
+  /**
+   * @param {string} field
+   * @param value
+   * @return {Find}
+   */
+  public andWhereContains(field: string, value: string) {
+    this.lastANDOR = 'AND';
+    this.query.addCondition(this.lastANDOR, field, 'LIKE', `%${value}%`);
     return this;
   }
 
@@ -836,9 +859,31 @@ export class Find {
    * @param value
    * @return {Find}
    */
-  public orWhereLike(field: string, value: any) {
+  public orWhereStartsWith(field: string, value: string) {
     this.lastANDOR = (this.lastANDOR == null) ? 'AND' : 'OR';
-    this.query.addCondition(this.lastANDOR, field, 'LIKE', value);
+    this.query.addCondition(this.lastANDOR, field, 'LIKE', `%${value}`);
+    return this;
+  }
+
+  /**
+   * @param {string} field
+   * @param value
+   * @return {Find}
+   */
+  public orWhereEndsWith(field: string, value: any) {
+    this.lastANDOR = (this.lastANDOR == null) ? 'AND' : 'OR';
+    this.query.addCondition(this.lastANDOR, field, 'LIKE', `${value}%`);
+    return this;
+  }
+
+  /**
+   * @param {string} field
+   * @param value
+   * @return {Find}
+   */
+  public orWhereContains(field: string, value: any) {
+    this.lastANDOR = (this.lastANDOR == null) ? 'AND' : 'OR';
+    this.query.addCondition(this.lastANDOR, field, 'LIKE', `%${value}%`);
     return this;
   }
 
