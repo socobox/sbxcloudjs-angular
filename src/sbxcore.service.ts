@@ -719,7 +719,8 @@ export class Find {
    */
   public andWhereStartsWith(field: string, value: string) {
     this.lastANDOR = 'AND';
-    this.query.addCondition(this.lastANDOR, field, 'LIKE', `%${value}`);
+    value = value && value.length > 0 ? `%${value}` : value;
+    this.query.addCondition(this.lastANDOR, field, 'LIKE', value);
     return this;
   }
 
@@ -731,7 +732,8 @@ export class Find {
    */
   public andWhereEndsWith(field: string, value: string) {
     this.lastANDOR = 'AND';
-    this.query.addCondition(this.lastANDOR, field, 'LIKE', `${value}%`);
+    value = value && value.length > 0 ? `${value}%` : value;
+    this.query.addCondition(this.lastANDOR, field, 'LIKE', value);
     return this;
   }
 
@@ -742,7 +744,8 @@ export class Find {
    */
   public andWhereContains(field: string, value: string) {
     this.lastANDOR = 'AND';
-    this.query.addCondition(this.lastANDOR, field, 'LIKE', `%${value}%`);
+    value = value && value.length > 0 ? `%${value.split(' ').join('%')}%` : value;
+    this.query.addCondition(this.lastANDOR, field, 'LIKE', value);
     return this;
   }
 
@@ -861,6 +864,7 @@ export class Find {
    */
   public orWhereStartsWith(field: string, value: string) {
     this.lastANDOR = (this.lastANDOR == null) ? 'AND' : 'OR';
+    value = value && value.length > 0 ? `%${value}` : value;
     this.query.addCondition(this.lastANDOR, field, 'LIKE', `%${value}`);
     return this;
   }
@@ -870,8 +874,9 @@ export class Find {
    * @param value
    * @return {Find}
    */
-  public orWhereEndsWith(field: string, value: any) {
+  public orWhereEndsWith(field: string, value: string) {
     this.lastANDOR = (this.lastANDOR == null) ? 'AND' : 'OR';
+    value = value && value.length > 0 ? `${value}%` : value;
     this.query.addCondition(this.lastANDOR, field, 'LIKE', `${value}%`);
     return this;
   }
@@ -881,9 +886,11 @@ export class Find {
    * @param value
    * @return {Find}
    */
-  public orWhereContains(field: string, value: any) {
+  public orWhereContains(field: string, value: string) {
     this.lastANDOR = (this.lastANDOR == null) ? 'AND' : 'OR';
-    this.query.addCondition(this.lastANDOR, field, 'LIKE', `%${value}%`);
+    // if the user sends null or empty, there will be no wildcar placed.
+    value = value && value.length > 0 ? `%${value.split(' ').join('%')}%` : value;
+    this.query.addCondition(this.lastANDOR, field, 'LIKE', value);
     return this;
   }
 
