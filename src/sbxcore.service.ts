@@ -184,12 +184,12 @@ export class SbxCoreService {
    * @param {Callback} callBack
    */
   requestChangePassword(userId, userCode, newPassword, callBack) {
-    const httpParams = new HttpParams().set('domain', SbxCoreService.environment.domain)
-                                        .set('password', newPassword)
-                                        .set('user_id', userId)
-                                        .set('code', userCode);
-    const option = { headers: this.getHeadersJSON(), params: httpParams };
-    this.observableToCallBack(this.httpClient.get(this.$p(this.urls.update_password), option), callBack);
+    const body = {domain: SbxCoreService.environment.domain,
+                                        password: newPassword,
+                                        user_id: userId,
+                                        code: userCode};
+    const option = { headers: this.getHeadersJSON() };
+    this.observableToCallBack(this.httpClient.put(this.$p(this.urls.update_password), body, option), callBack);
   }
 
   /**
@@ -200,12 +200,12 @@ export class SbxCoreService {
    * @return {Observable<Object>}
    */
   requestChangePasswordRx(userId, userCode, newPassword) {
-    const httpParams = new HttpParams().set('domain', SbxCoreService.environment.domain)
-                                        .set('password', newPassword)
-                                        .set('user_id', userId)
-                                        .set('code', userCode);
-    const option = { headers: this.getHeadersJSON(), params: httpParams };
-    return this.httpClient.get(this.$p(this.urls.update_password), option).map(data => data);
+    const body = {domain: SbxCoreService.environment.domain,
+      password: newPassword,
+      user_id: userId,
+      code: userCode};
+    const option = { headers: this.getHeadersJSON()};
+    return this.httpClient.put(this.$p(this.urls.update_password), body ,option).map(data => data);
   }
 
   /**
