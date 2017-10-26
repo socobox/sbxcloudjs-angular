@@ -189,7 +189,7 @@ export class SbxCoreService {
                                         user_id: userId,
                                         code: userCode};
     const option = { headers: this.getHeadersJSON() };
-    this.observableToCallBack(this.httpClient.put(this.$p(this.urls.update_password), body, option), callBack);
+    this.observableToCallBack(this.httpClient.put(this.$p(this.urls.password), body, option), callBack);
   }
 
   /**
@@ -205,7 +205,7 @@ export class SbxCoreService {
       user_id: userId,
       code: userCode};
     const option = { headers: this.getHeadersJSON()};
-    return this.httpClient.put(this.$p(this.urls.update_password), body ,option).map(data => data);
+    return this.httpClient.put(this.$p(this.urls.password), body , option).map(data => data);
   }
 
   /**
