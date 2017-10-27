@@ -68,17 +68,6 @@ export class SbxCoreService {
    */
 
   /**
-   * @param {string} login
-   * @param {string} password
-   * @param {Callback} callBack
-   */
-  login(login: string, password: string, callBack: Callback) {
-    const httpParams = new HttpParams().set('login', this.encodeEmails(login)).set('password', password);
-    const option = {headers: this.getHeadersJSON(), params: httpParams};
-    this.observableToCallBack(this.httpClient.get(this.$p(this.urls.login), option), callBack);
-  }
-
-  /**
    * @param {string} token
    * @param {Callback} callBack
    */
@@ -95,11 +84,25 @@ export class SbxCoreService {
   validateRx(token: string): Observable<any> {
     const httpParams = new HttpParams().set('token', token) ;
     const option = {headers: this.getHeadersJSON(), params: httpParams};
-     return this.httpClient.get(this.$p(this.urls.validate), option).map(data => data as any) ;
+    return this.httpClient.get(this.$p(this.urls.validate), option).map(data => data as any) ;
   }
 
   private encodeEmails(email: string) {
-    return email.replace('+', '%2B');
+    const spl = email.split('@');
+    if (spl.length > 0) {
+      email = encodeURIComponent(spl[0]) + '@' + spl[1];
+    }
+    return email;
+  }
+
+  private validateLogin(login: string): boolean {
+    const rlogin   =  /^(\w?\.?\-?)+$/;
+    return rlogin.test(login);
+  }
+
+  private validateEmail(email: string): boolean {
+    const rlogin  =  /^(\w?\.?\-?\+?)+@(\w?\.?\-?)+$/;
+    return rlogin.test(email);
   }
 
   /**
@@ -111,24 +114,14 @@ export class SbxCoreService {
    * @param {Callback} callBack
    */
   signUp(login: string, email: string, name: string, password: string, callBack: Callback) {
-    const httpParams = new HttpParams().set('login', this.encodeEmails(login))
-      .set('password', password)
-      .set('name', name)
-      .set('domain', SbxCoreService.environment.domain.toLocaleString())
-      .set('email', this.encodeEmails(email));
-    const option = {headers: this.getHeadersJSON(), params: httpParams};
-    this.observableToCallBack(this.httpClient.get(this.$p(this.urls.register), option), callBack);
-  }
-
-  /**
-   * @param {string} login
-   * @param {string} password
-   * @return {Observable<any>}
-   */
-  loginRx(login: string, password: string): Observable<any> {
-    const httpParams = new HttpParams().set('login', this.encodeEmails(login)).set('password', password);
-    const option = {headers: this.getHeadersJSON(), params: httpParams};
-    return   this.httpClient.get(this.$p(this.urls.login), option).map(data => data as any);
+    if (this.validateLogin(login) && this.validateEmail(email)) {
+      const option = {headers: this.getHeadersJSON()};
+      const params = '?email=' + this.encodeEmails(email) + '&password=' +  encodeURIComponent(password) + '&name='
+        + name + '&login=' + login + '&domain=' + SbxCoreService.environment.domain.toLocaleString();
+      this.observableToCallBack(this.httpClient.get(this.$p(this.urls.register) + params, option), callBack);
+    } else {
+      callBack.error({success: false, error: 'Login or email contains invalid characters. Letters, numbers and underscore are accepted'});
+    }
   }
 
   /**
@@ -139,14 +132,49 @@ export class SbxCoreService {
    * @return {Observable<any>}
    */
   signUpRx(login: string, email: string, name: string, password: string): Observable<any> {
-    const httpParams = new HttpParams().set('login', this.encodeEmails(login))
-      .set('password', password)
-      .set('name', name)
-      .set('domain', SbxCoreService.environment.domain.toLocaleString())
-      .set('email', this.encodeEmails(email));
-    const option = {headers: this.getHeadersJSON(), params: httpParams};
-    return this.httpClient.get(this.$p(this.urls.register), option).map(data => data as any);
+    if (this.validateLogin(login) && this.validateEmail(email)) {
+      const option = {headers: this.getHeadersJSON()};
+      const params = '?email=' + this.encodeEmails(email) + '&password=' +  encodeURIComponent(password) + '&name='
+        + name + '&login=' + login + '&domain=' + SbxCoreService.environment.domain.toLocaleString();
+      return this.httpClient.get(this.$p(this.urls.register) + params, option).map(data => data as any);
+    } else {
+      return Observable.of({success: false,
+        error: 'Login or email contains invalid characters. Letters, numbers and underscore are accepted'});
+    }
   }
+
+  /**
+   * @param {string} login
+   * @param {string} password
+   * @param {Callback} callBack
+   */
+  login(login: string, password: string, callBack: Callback) {
+    if ( (this.validateLogin(login) && login.indexOf('@') < 0) ||  (login.indexOf('@') >= 0 && this.validateEmail(login))) {
+      const option = {headers: this.getHeadersJSON()};
+      const params = '?login=' + this.encodeEmails(login) + '&password=' + encodeURIComponent(password);
+      this.observableToCallBack(this.httpClient.get(this.$p(this.urls.login) + params, option), callBack);
+    } else {
+      callBack.error({success: false,
+        error: 'Login contains invalid characters. Letters, numbers and underscore are accepted'});
+    }
+  }
+
+  /**
+   * @param {string} login
+   * @param {string} password
+   * @return {Observable<any>}
+   */
+  loginRx(login: string, password: string): Observable<any> {
+    if ( (this.validateLogin(login) && login.indexOf('@') < 0) ||  (login.indexOf('@') >= 0 && this.validateEmail(login))) {
+      const option = {headers: this.getHeadersJSON()};
+      const params = '?login=' + this.encodeEmails(login) + '&password=' + encodeURIComponent(password);
+      return this.httpClient.get(this.$p(this.urls.login) + params, option).map(data => data as any);
+    }else {
+      return Observable.of({success: false,
+        error: 'Login contains invalid characters. Letters, numbers and underscore are accepted'});
+    }
+  }
+
 
   /**
    * Send email to changePassword
@@ -156,7 +184,7 @@ export class SbxCoreService {
    * @param {Callback} callBack
    */
   sendPasswordRequest(userEmail: string, subject: string, emailTemplate: string, callBack: Callback) {
-    const body =  {user_email: this.encodeEmails(userEmail),
+    const body =  {user_email: userEmail,
       domain: SbxCoreService.environment.domain, subject: subject, email_template: emailTemplate};
     const option = {headers: this.getHeadersJSON() };
     this.observableToCallBack(this.httpClient.post(this.$p(this.urls.password), body, option), callBack);
@@ -170,7 +198,7 @@ export class SbxCoreService {
    * @return {Observable<Object>}
    */
   sendPasswordRequestRx(userEmail: string, subject: string, emailTemplate: string): Observable<any> {
-    const body =  {user_email: this.encodeEmails(userEmail),
+    const body =  {user_email: userEmail,
       domain: SbxCoreService.environment.domain, subject: subject, email_template: emailTemplate};
     const option = {headers: this.getHeadersJSON() };
     return this.httpClient.post(this.$p(this.urls.password), body, option).map( data => data as any);
@@ -185,9 +213,9 @@ export class SbxCoreService {
    */
   requestChangePassword(userId, userCode, newPassword, callBack) {
     const body = {domain: SbxCoreService.environment.domain,
-                                        password: newPassword,
-                                        user_id: userId,
-                                        code: userCode};
+      password: newPassword,
+      user_id: userId,
+      code: userCode};
     const option = { headers: this.getHeadersJSON() };
     this.observableToCallBack(this.httpClient.put(this.$p(this.urls.password), body, option), callBack);
   }
@@ -519,7 +547,7 @@ export class SbxCoreService {
   public observableToCallBack(observable: Observable<Object>, callBack: Callback) {
     observable.map(res => res as any)
       .subscribe(response => {
-          callBack.ok(response);
+        callBack.ok(response);
       }, error => {
         callBack.error(error as any);
       });
