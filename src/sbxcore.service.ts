@@ -89,7 +89,7 @@ export class SbxCoreService {
 
   private encodeEmails(email: string) {
     const spl = email.split('@');
-    if (spl.length > 0) {
+    if (spl.length > 1) {
       email = encodeURIComponent(spl[0]) + '@' + spl[1];
     }
     return email;
