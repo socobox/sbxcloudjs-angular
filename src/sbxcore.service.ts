@@ -324,25 +324,31 @@ export class SbxCoreService {
     return new Find(model, this, true);
   }
 
+
   /**
-   * @param {string} subject
-   * @param {string} to
-   * @param {string} from
-   * @param {string} body can be a html or a template
-   * @param {boolean} isTemplate
+   * @param {EmailData} data
    * @param {Callback} callBack
    */
-  sendEmail(subject: string, to: string, from: string, body: string, isTemplate: boolean, callBack: Callback) {
+  sendEmail(data: EmailData  , callBack: Callback) {
     const mail = {
-      subject: subject,
-      to: to,
+      subject: data.subject,
+      to: data.to,
       domain: SbxCoreService.environment.domain,
-      from: from,
+      from: data.from,
     } as any;
-    if (!isTemplate) {
-      mail.html = body;
+    if (data.template) {
+      mail.html = data.template;
     } else {
-      mail.email_template = body;
+      mail.email_template = data.template_key;
+    }
+    if (data.cc) {
+      mail.cc = data.cc;
+    }
+    if (data.bcc) {
+      mail.bcc = data.bcc;
+    }
+    if (data.data) {
+      mail.data = data.data;
     }
     const option = {headers: this.getHeadersJSON() };
     this.observableToCallBack(this.httpClient.post(this.$p(this.urls.send_mail), mail, option), callBack);
@@ -356,17 +362,26 @@ export class SbxCoreService {
    * @param {boolean} isTemplate
    * @return {Observable<any>}
    */
-  sendEmailRx(subject: string, to: string, from: string, body: string, isTemplate: boolean): Observable<any> {
+  sendEmailRx(data: EmailData): Observable<any> {
     const mail = {
-      subject: subject,
-      to: to,
+      subject: data.subject,
+      to: data.to,
       domain: SbxCoreService.environment.domain,
-      from: from,
+      from: data.from,
     } as any;
-    if (!isTemplate) {
-      mail.html = body;
+    if (data.template) {
+      mail.html = data.template;
     } else {
-      mail.email_template = body;
+      mail.email_template = data.template_key;
+    }
+    if (data.cc) {
+      mail.cc = data.cc;
+    }
+    if (data.bcc) {
+      mail.bcc = data.bcc;
+    }
+    if (data.data) {
+      mail.data = data.data;
     }
     const option = {headers: this.getHeadersJSON() };
     return this.httpClient.post(this.$p(this.urls.send_mail), mail, option).map(res => res as any);
@@ -1034,7 +1049,7 @@ export class Find {
       this.setPageSize(100);
       const query = this.query.compile();
       return this.thenRx(query)
-        .flatMap(function (response) {
+        .flatMap(response => {
           this.totalpages = response.total_pages;
           let i = 1;
           const temp = [];
@@ -1046,7 +1061,7 @@ export class Find {
           return Observable.forkJoin(temp);
         })
         .map(res => res as any)
-        .map(function(results){
+        .map((results) => {
           let result = [];
           results.forEach(array => {
             const v = array as any;
@@ -1220,4 +1235,15 @@ export class FilterJoin {
     return this.find;
   }
 
+}
+
+export interface EmailData {
+  subject: string;
+  from: string;
+  template?: string;
+  template_key?: string;
+  data?: any;
+  to: string|Array<string>;
+  bcc?: string|Array<string>;
+  cc?: string|Array<string>;
 }
