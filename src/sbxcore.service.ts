@@ -1022,8 +1022,9 @@ export class Find {
         let i = 1;
         const temp = [];
         while (i <= this.totalpages) {
-          this.setPage(i);
-          temp.push(this.find(query));
+          const queryAux = JSON.parse(JSON.stringify(query));
+          queryAux.page = i;
+          temp.push(this.find(queryAux));
           i = i + 1;
         }
         Observable.forkJoin(temp)
@@ -1054,8 +1055,9 @@ export class Find {
           let i = 1;
           const temp = [];
           while (i <= this.totalpages) {
-            this.setPage(i);
-            temp.push(this.find(query));
+            const queryAux = JSON.parse(JSON.stringify(query));
+            queryAux.page = i;
+            temp.push(this.find(queryAux));
             i = i + 1;
           }
           return Observable.forkJoin(temp);
