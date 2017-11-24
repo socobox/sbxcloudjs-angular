@@ -975,6 +975,16 @@ export class Find {
     return this;
   }
 
+  /**
+   * @param {string} field
+   * @param asc
+   * @return {Find}
+   */
+  public orderBy(field: string, asc: Boolean= false) {
+    this.query.orderBy(  field, asc);
+    return this;
+  }
+
   public fetchModels(array: string[]) {
     if (this.isFind) {
       this.query.fetchModels(array);
