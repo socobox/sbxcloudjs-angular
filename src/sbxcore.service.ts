@@ -908,7 +908,7 @@ export class Find {
   public orWhereStartsWith(field: string, value: string) {
     this.lastANDOR = (this.lastANDOR == null) ? 'AND' : 'OR';
     value = value && value.length > 0 ? `%${value}` : value;
-    this.query.addCondition(this.lastANDOR, field, 'LIKE', `%${value}`);
+    this.query.addCondition(this.lastANDOR, field, 'LIKE', value);
     return this;
   }
 
@@ -920,7 +920,7 @@ export class Find {
   public orWhereEndsWith(field: string, value: string) {
     this.lastANDOR = (this.lastANDOR == null) ? 'AND' : 'OR';
     value = value && value.length > 0 ? `${value}%` : value;
-    this.query.addCondition(this.lastANDOR, field, 'LIKE', `${value}%`);
+    this.query.addCondition(this.lastANDOR, field, 'LIKE', value);
     return this;
   }
 
