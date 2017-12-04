@@ -339,7 +339,7 @@ export class SbxCoreService {
     if (data.template) {
       mail.html = data.template;
     } else {
-      mail.email_template = data.template_key;
+      mail.template_key = data.template_key;
     }
     if (data.cc) {
       mail.cc = data.cc;
@@ -372,7 +372,7 @@ export class SbxCoreService {
     if (data.template) {
       mail.html = data.template;
     } else {
-      mail.email_template = data.template_key;
+      mail.template_key = data.template_key;
     }
     if (data.cc) {
       mail.cc = data.cc;
