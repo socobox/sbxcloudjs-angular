@@ -33,7 +33,7 @@
     "outDir": "dist",
     "sourceMap": true,
     "inlineSources": true,
-    "target": "es6",
+    "target": "es5",
     "skipLibCheck": true,
     "lib": [
       "es6",
