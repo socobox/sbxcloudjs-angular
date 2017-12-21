@@ -1,7 +1,13 @@
 import { Injectable } from '@angular/core';
 import {Callback, SbxCoreService} from '../sbxcore.service';
 import {CookieService} from 'ngx-cookie-service';
-import {Observable} from 'rxjs/Rx';
+import {Observable} from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/mergeMap';
+import 'rxjs/add/observable/of';
+import 'rxjs/add/observable/forkJoin';
+
+
 
 @Injectable()
 export class SbxSessionService {

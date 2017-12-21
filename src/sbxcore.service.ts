@@ -1,7 +1,11 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import QueryBuilder from 'sbx-querybuilder/index';
-import {Observable} from 'rxjs/Rx';
+import {Observable} from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/mergeMap';
+import 'rxjs/add/observable/forkJoin';
+import 'rxjs/add/observable/of';
 
 @Injectable()
 export class SbxCoreService {
@@ -1067,7 +1071,7 @@ export class Find {
       this.setPageSize(100);
       const query = this.query.compile();
       return this.thenRx(query)
-        .flatMap(response => {
+        .mergeMap(response => {
           this.totalpages = response.total_pages;
           let i = 1;
           const temp = [];
