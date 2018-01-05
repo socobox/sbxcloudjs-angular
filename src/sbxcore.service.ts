@@ -151,11 +151,13 @@ export class SbxCoreService {
    * @param {string} login
    * @param {string} password
    * @param {Callback} callBack
+   * @param {domain}
    */
-  login(login: string, password: string, callBack: Callback) {
+  login(login: string, password: string, callBack: Callback, domain?: number) {
     if ( (this.validateLogin(login) && login.indexOf('@') < 0) ||  (login.indexOf('@') >= 0 && this.validateEmail(login))) {
       const option = {headers: this.getHeadersJSON()};
-      const params = '?login=' + this.encodeEmails(login) + '&password=' + encodeURIComponent(password);
+      const params = '?login=' + this.encodeEmails(login) + '&password=' +
+        encodeURIComponent(password) + (domain ? '&domain' + domain : '');
       this.observableToCallBack(this.httpClient.get(this.$p(this.urls.login) + params, option), callBack);
     } else {
       callBack.error({success: false,
@@ -166,12 +168,14 @@ export class SbxCoreService {
   /**
    * @param {string} login
    * @param {string} password
+   *  @param {domain}
    * @return {Observable<any>}
    */
-  loginRx(login: string, password: string): Observable<any> {
+  loginRx(login: string, password: string, domain?: number): Observable<any> {
     if ( (this.validateLogin(login) && login.indexOf('@') < 0) ||  (login.indexOf('@') >= 0 && this.validateEmail(login))) {
       const option = {headers: this.getHeadersJSON()};
-      const params = '?login=' + this.encodeEmails(login) + '&password=' + encodeURIComponent(password);
+      const params = '?login=' + this.encodeEmails(login) + '&password=' + encodeURIComponent(password)
+        + (domain ? '&domain' + domain : '');
       return this.httpClient.get(this.$p(this.urls.login) + params, option).map(data => data as any);
     }else {
       return Observable.of({success: false,

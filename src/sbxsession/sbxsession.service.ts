@@ -69,7 +69,7 @@ export class SbxSessionService {
 
 
   private updateUser(data: any) {
-    this.getCurrentUser().token = data.token
+    this.getCurrentUser().token = data.token;
     this.getCurrentUser().id = data.user.id;
     this.getCurrentUser().name = data.user.name;
     this.getCurrentUser().login = data.user.login;
@@ -81,7 +81,7 @@ export class SbxSessionService {
    * Auth user methods
    */
 
-  login(login: string, password: string, callBack: Callback): void {
+  login(login: string, password: string, callBack: Callback, domain?: number): void {
     this.sbxCoreService.login(login,
       password, new Callback(
         data => {
@@ -89,11 +89,11 @@ export class SbxSessionService {
             this.updateUser(data);
           }
           callBack.ok(data);
-        }, callBack.error));
+        }, callBack.error), domain);
   }
 
-  loginRx(login: string, password: string) {
-    return this.sbxCoreService.loginRx(login, password)
+  loginRx(login: string, password: string, domain?: number) {
+    return this.sbxCoreService.loginRx(login, password, domain)
       .map(data => {
         if (data.success) {
           this.updateUser(data);
