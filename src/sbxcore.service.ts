@@ -157,7 +157,7 @@ export class SbxCoreService {
     if ( (this.validateLogin(login) && login.indexOf('@') < 0) ||  (login.indexOf('@') >= 0 && this.validateEmail(login))) {
       const option = {headers: this.getHeadersJSON()};
       const params = '?login=' + this.encodeEmails(login) + '&password=' +
-        encodeURIComponent(password) + (domain ? '&domain' + domain : '');
+        encodeURIComponent(password) + (domain ? '&domain=' + domain : '');
       this.observableToCallBack(this.httpClient.get(this.$p(this.urls.login) + params, option), callBack);
     } else {
       callBack.error({success: false,
@@ -175,7 +175,7 @@ export class SbxCoreService {
     if ( (this.validateLogin(login) && login.indexOf('@') < 0) ||  (login.indexOf('@') >= 0 && this.validateEmail(login))) {
       const option = {headers: this.getHeadersJSON()};
       const params = '?login=' + this.encodeEmails(login) + '&password=' + encodeURIComponent(password)
-        + (domain ? '&domain' + domain : '');
+        + (domain ? '&domain=' + domain : '');
       return this.httpClient.get(this.$p(this.urls.login) + params, option).map(data => data as any);
     }else {
       return Observable.of({success: false,
