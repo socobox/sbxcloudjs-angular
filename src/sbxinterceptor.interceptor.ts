@@ -4,9 +4,9 @@ import { Observable } from 'rxjs/observable';
 @Injectable()
 export class SbxInterceptor implements HttpInterceptor {
   intercept (req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const authReq = req.clone({
-      headers: req.headers.set('Accept-Encoding', 'gzip')
-    });
-    return next.handle(authReq);
+    // const authReq = req.clone({
+    //   headers: req.headers.set('Accept-Encoding', 'gzip')
+    // });
+    return next.handle(req);
   }
 }

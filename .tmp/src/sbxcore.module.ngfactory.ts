@@ -10,7 +10,8 @@ import * as i0 from '@angular/core';
 import * as i1 from '../../src/sbxcore.module';
 import * as i2 from '@angular/common';
 import * as i3 from '@angular/common/http';
-import * as i4 from '../../src/sbxcore.service';
+import * as i4 from '../../src/sbxinterceptor.interceptor';
+import * as i5 from '../../src/sbxcore.service';
 export const SbxCoreModuleNgFactory:i0.NgModuleFactory<i1.SbxCoreModule> = i0.ɵcmf(i1.SbxCoreModule,
     ([] as any[]),(_l:any) => {
       return i0.ɵmod([i0.ɵmpd(512,i0.ComponentFactoryResolver,i0.ɵCodegenComponentFactoryResolver,
@@ -18,16 +19,16 @@ export const SbxCoreModuleNgFactory:i0.NgModuleFactory<i1.SbxCoreModule> = i0.ɵ
           i2.NgLocalization,i2.NgLocaleLocalization,[i0.LOCALE_ID]),i0.ɵmpd(4608,i3.HttpXsrfTokenExtractor,
           i3.ɵg,[i2.DOCUMENT,i0.PLATFORM_ID,i3.ɵe]),i0.ɵmpd(4608,i3.ɵh,i3.ɵh,[i3.HttpXsrfTokenExtractor,
           i3.ɵf]),i0.ɵmpd(5120,i3.HTTP_INTERCEPTORS,(p0_0:any) => {
-        return [p0_0];
+        return [p0_0,new i4.SbxInterceptor()];
       },[i3.ɵh]),i0.ɵmpd(4608,i3.ɵd,i3.ɵd,([] as any[])),i0.ɵmpd(6144,i3.XhrFactory,
           (null as any),[i3.ɵd]),i0.ɵmpd(4608,i3.HttpXhrBackend,i3.HttpXhrBackend,
           [i3.XhrFactory]),i0.ɵmpd(6144,i3.HttpBackend,(null as any),[i3.HttpXhrBackend]),
           i0.ɵmpd(5120,i3.HttpHandler,i3.ɵinterceptingHandler,[i3.HttpBackend,[2,i3.HTTP_INTERCEPTORS]]),
           i0.ɵmpd(4608,i3.HttpClient,i3.HttpClient,[i3.HttpHandler]),i0.ɵmpd(4608,
-              i4.SbxCoreService,i4.SbxCoreService,[i3.HttpClient]),i0.ɵmpd(512,i2.CommonModule,
+              i5.SbxCoreService,i5.SbxCoreService,[i3.HttpClient]),i0.ɵmpd(512,i2.CommonModule,
               i2.CommonModule,([] as any[])),i0.ɵmpd(512,i3.HttpClientXsrfModule,i3.HttpClientXsrfModule,
               ([] as any[])),i0.ɵmpd(512,i3.HttpClientModule,i3.HttpClientModule,([] as any[])),
           i0.ɵmpd(512,i1.SbxCoreModule,i1.SbxCoreModule,([] as any[])),i0.ɵmpd(256,
               i3.ɵe,'XSRF-TOKEN',([] as any[])),i0.ɵmpd(256,i3.ɵf,'X-XSRF-TOKEN',([] as any[]))]);
     });
-//# sourceMappingURL=data:application/json;base64,eyJmaWxlIjoiL1VzZXJzL2xnZ3V6bWFuL0RvY3VtZW50cy9Bbmd1bGFyNHByb2plY3RzL2xpYnJhcnkvYW5ndWxhcjRsaWJyYXJ5L3NyYy9zYnhjb3JlLm1vZHVsZS5uZ2ZhY3RvcnkudHMiLCJ2ZXJzaW9uIjozLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyJuZzovLy9Vc2Vycy9sZ2d1em1hbi9Eb2N1bWVudHMvQW5ndWxhcjRwcm9qZWN0cy9saWJyYXJ5L2FuZ3VsYXI0bGlicmFyeS9zcmMvc2J4Y29yZS5tb2R1bGUudHMiXSwic291cmNlc0NvbnRlbnQiOlsiICJdLCJtYXBwaW5ncyI6IkFBQUE7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7In0=
+//# sourceMappingURL=data:application/json;base64,eyJmaWxlIjoiL1VzZXJzL2xnZ3V6bWFuL0RvY3VtZW50cy9Bbmd1bGFyNHByb2plY3RzL2xpYnJhcnkvYW5ndWxhcjRsaWJyYXJ5L3NyYy9zYnhjb3JlLm1vZHVsZS5uZ2ZhY3RvcnkudHMiLCJ2ZXJzaW9uIjozLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyJuZzovLy9Vc2Vycy9sZ2d1em1hbi9Eb2N1bWVudHMvQW5ndWxhcjRwcm9qZWN0cy9saWJyYXJ5L2FuZ3VsYXI0bGlicmFyeS9zcmMvc2J4Y29yZS5tb2R1bGUudHMiXSwic291cmNlc0NvbnRlbnQiOlsiICJdLCJtYXBwaW5ncyI6IkFBQUE7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OyJ9

@@ -1090,11 +1090,30 @@ export class Find {
         .map(res => res as any)
         .map((results) => {
           let result = [];
+          const fetched_results = {};
           results.forEach(array => {
             const v = array as any;
             result = result.concat(v.results);
+            if (v.fetched_results) {
+              const objs = Object.keys(v.fetched_results);
+              for (let i = 0; i < objs.length; i++) {
+                const type_name =  objs[i];
+                if (!fetched_results.hasOwnProperty(type_name)) {
+                  fetched_results[type_name] = {};
+                }
+                const keys = Object.keys(v.fetched_results[type_name]);
+                for (let j = 0; j < keys.length; j++) {
+                  const key = keys[j];
+                  if (v.fetched_results[type_name].hasOwnProperty(key)) {
+                    fetched_results[type_name][key] = v.fetched_results[type_name][key];
+                  }
+                }
+
+              }
+
+            }
           });
-          return {success: true, results: result};
+          return {success: true, results: result, fetched_results: fetched_results};
         });
     }else {
       return this.thenRx();
