@@ -1055,11 +1055,30 @@ export class Find {
         Observable.forkJoin(temp)
           .map(res => res as any).subscribe(results => {
             let result = [];
+            const fetched_results = {};
             results.forEach(array => {
               const v = array as any;
               result = result.concat(v.results);
+              if (v.fetched_results) {
+                const objs = Object.keys(v.fetched_results);
+                for (let k = 0; k < objs.length; k++) {
+                  const type_name =  objs[k];
+                  if (!fetched_results.hasOwnProperty(type_name)) {
+                    fetched_results[type_name] = {};
+                  }
+                  const keys = Object.keys(v.fetched_results[type_name]);
+                  for (let j = 0; j < keys.length; j++) {
+                    const key = keys[j];
+                    if (v.fetched_results[type_name].hasOwnProperty(key)) {
+                      fetched_results[type_name][key] = v.fetched_results[type_name][key];
+                    }
+                  }
+
+                }
+
+              }
             });
-            callBack.ok(result);
+            callBack.ok({success: true, results: result, fetched_results: fetched_results});
           },
           error2 => {
             callBack.error(error2 as any);
