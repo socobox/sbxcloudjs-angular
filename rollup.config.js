@@ -10,11 +10,12 @@ export default {
 		'@angular/forms': 'ng.forms',
         '@angular/common/http': 'ng.common.http',
         'sbx-querybuilder/index': 'QueryBuilder',
-        'sbxcore': 'Find',
+        'sbxcorejs': 'Find',
         'ngx-cookie-service': 'ngxCookieService',
 		'rxjs/Observable': 'Rx',
 		'rxjs/add/operator/map': 'Rx.Observable.prototype',
 		'rxjs/add/operator/mergeMap': 'Rx.Observable.prototype',
+		'rxjs/add/operator/toPromise': 'Rx.Observable.prototype',
 		'rxjs/add/observable/of': 'Rx.Observable',
 		'rxjs/add/observable/forkJoin': 'Rx.Observable'
 	},
@@ -24,11 +25,12 @@ export default {
         '@angular/common/http',
         '@angular/forms',
         'sbx-querybuilder/index',
-        'sbxcore',
+        'sbxcorejs',
         'ngx-cookie-service',
         'rxjs/Observable',
         'rxjs/add/operator/map',
         'rxjs/add/operator/mergeMap',
+        'rxjs/add/operator/toPromise',
         'rxjs/add/observable/of',
         'rxjs/add/observable/forkJoin'
 	]
