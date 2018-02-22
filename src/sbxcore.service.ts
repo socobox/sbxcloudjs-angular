@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import QueryBuilder from 'sbx-querybuilder/index';
 import { Observable } from 'rxjs/Observable';
-import { Find } from 'sbxcore';
+import { Find } from 'sbxcorejs';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/toPromise';
@@ -501,12 +501,7 @@ export class AngularFind extends Find {
    */
   
   public then(toFetch = []) {
-    this.thenRx().toPromise().then(data => {
-      if(toFetch.length) {
-        return this.mapFetchesResult(data, toFetch);
-      }
-      return data;
-    });
+    return this.thenRx(toFetch).toPromise();
   }
 
   /**
@@ -571,9 +566,7 @@ export class AngularFind extends Find {
                     fetched_results[type_name][key] = v.fetched_results[type_name][key];
                   }
                 }
-
               }
-
             }
           });
           return {success: true, results: result, fetched_results: fetched_results};
