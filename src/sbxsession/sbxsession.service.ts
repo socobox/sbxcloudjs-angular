@@ -8,8 +8,6 @@ import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/forkJoin';
 
-
-
 @Injectable()
 export class SbxSessionService {
 
@@ -66,8 +64,6 @@ export class SbxSessionService {
     const today = new Date().getTime();
     this.cookieService.set(this.cookieToken, token, new Date(today + this.daysToExpire * SbxSessionService.day));
   }
-
-
 
   private updateUser(data: any) {
     this.getCurrentUser().token = data.token;

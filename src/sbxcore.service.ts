@@ -483,6 +483,63 @@ export class SbxCoreService {
     }
     return temp;
   }
+  
+  /**
+   * @deprecated Now you can parameterize the 'then' function with a fetch array
+   * @param response the response of the server
+   * @param {string[]} completefetch the array of fetch
+   * @returns {any} the response with the union between fetch_results and results
+   */
+  public mapFetchesResult(response: any, completefetch: string[] ) {
+
+    if (response.fetched_results) {
+      const fetch = [];
+      const secondfetch = {};
+      for (let i = 0; i < completefetch.length; i++) {
+        let index = 0;
+        const temp = completefetch[i].split('.');
+        if (fetch.indexOf(temp[0]) < 0) {
+          fetch.push(temp[0]);
+          index = fetch.length - 1;
+        } else {
+          index = fetch.indexOf(temp[0]);
+        }
+        if (temp.length === 2 && !secondfetch[fetch[index]]) {
+          secondfetch[fetch[index]] = [];
+        }
+
+        if (temp.length === 2) {
+          secondfetch[fetch[index]].push(temp[1]);
+        }
+      }
+      for (let i = 0; i < response.results.length; i++) {
+        for (let j = 0; j < fetch.length; j++) {
+          for (const mod in response.fetched_results) {
+            if (response.fetched_results[mod][response.results[i][fetch[j]]]) {
+              response.results[i][fetch[j]] = response.fetched_results[mod][response.results[i][fetch[j]]];
+              if (secondfetch[fetch[j]]) {
+                for (let k = 0; k < secondfetch[fetch[j]].length; k++) {
+                  const second = secondfetch[fetch[j]][k];
+                  for (const mod2 in response.fetched_results) {
+                    if (response.fetched_results[mod2][response.results[i][fetch[j]][second]]) {
+                      response.results[i][fetch[j]][second] =
+                        response.fetched_results[mod2][response.results[i][fetch[j]][second]];
+                      break;
+                    }
+                  }
+                }
+              }
+
+              break;
+            }
+          }
+        }
+
+      }
+    }
+
+    return response;
+  }
 
 }
 
