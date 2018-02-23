@@ -2,7 +2,9 @@
 
 [![SBX](https://sbxcloud.com/www/ibuyflowersdirect/powered.png)](https://sbxcloud.com)
 
-All the functions have the implementation with 'Promise' and with 'Rxjs', in case of using 'Promise', a polyfill of 'Promise' must be installed if the browser does not have 'Promise' implementation.
+Welcome, this repo is the Angular 5 implementation of [sbxcorejs](https://github.com/sbxcloud/sbxcorejs) library.
+
+All the functions have the implementation with Promise and with Rxjs, in case of using Promise, a polyfill of Promise must be installed if the browser does not have Promise implementation.
 
 Examples of polyfill:
 - [es6-promise](https://github.com/stefanpenner/es6-promise)
@@ -13,8 +15,6 @@ Examples of polyfill:
 In app.module.ts file:
 ```
 import { SbxCoreModule, SbxSessionModule, SbxSessionService } from 'sbxangular';
-import { AppComponent } from './app.component';
-
 @NgModule({
   declarations: [
     AppComponent
@@ -31,7 +31,8 @@ export class AppModule {
   }
 }
 ```
-Also, you can initialize with Angular environment:
+
+Also, you can initialize with Angular environment: 
 In environment.ts
 ```
 export const environment = {
@@ -42,7 +43,6 @@ export const environment = {
 then, in app.module.ts
 ```
 import { SbxCoreModule, SbxSessionModule, SbxSessionService } from 'sbxangular';
-import { AppComponent } from './app.component';
 import { environment } from '../environments/environment';
 
 @NgModule({
