@@ -20,8 +20,8 @@ export class SbxSessionService {
   private _user: User;
 
 
-  public initialize(domain: number, baseUrl: string, appKey: string) {
-    this.sbxCoreService.initialize(domain, baseUrl, appKey);
+  public initialize(domain: number, appKey: string) {
+    this.sbxCoreService.initialize(domain, appKey);
     this.islogged();
   }
 
@@ -30,7 +30,7 @@ export class SbxSessionService {
    * @param environment (domain, base_url, appkey)
    */
   public initializeWithEnvironment(environment: any) {
-    this.sbxCoreService.initialize(environment.domain, environment.baseUrl, environment.appKey);
+    this.sbxCoreService.initialize(environment.domain, environment.appKey, environment.baseUrl);
     this.islogged();
   }
 

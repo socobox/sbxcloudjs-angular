@@ -12,7 +12,7 @@ import 'rxjs/add/observable/of';
 @Injectable()
 export class SbxCoreService {
 
-  public static environment = {} as any;
+  public static environment = { } as any;
   private headers: any;
 
   private urls: any = {
@@ -36,17 +36,16 @@ export class SbxCoreService {
     cloudscript_run: '/cloudscript/v1/run'
   };
 
-  constructor(private httpClient: HttpClient) {
+  constructor(private httpClient: HttpClient) { }
 
-  }
-
-  public initialize(domain: number, baseUrl: string, appKey: string) {
+  public initialize(domain: number, appKey: string, baseUrl: string = 'https://sbxcloud.com/api') {
     SbxCoreService.environment.domain = domain;
     SbxCoreService.environment.baseUrl = baseUrl;
     SbxCoreService.environment.appKey = appKey;
     this.headers = new HttpHeaders()
       .set('App-Key', SbxCoreService.environment.appKey);
   }
+  
   public addHeaderAttr(name: string, value: string): void {
     this.headers = this.getHeaders().set(name, value);
   }
