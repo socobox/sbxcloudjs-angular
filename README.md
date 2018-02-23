@@ -31,16 +31,16 @@ export class AppModule {
   }
 }
 ```
+##### Also, you can initialize with Angular environment: 
 
-Also, you can initialize with Angular environment: 
-In environment.ts
+In environment.ts file:
 ```
 export const environment = {
   appKey: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
   domain: x // Integer
 }
 ```
-then, in app.module.ts
+then, in app.module.ts file:
 ```
 import { SbxCoreModule, SbxSessionModule, SbxSessionService } from 'sbxangular';
 import { environment } from '../environments/environment';
