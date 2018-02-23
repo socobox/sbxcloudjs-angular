@@ -1,6 +1,6 @@
 # Angular4library
 
-[![SBX](https://sbxcloud.com/www/ibuyflowersdirect/powered.png)](https://sbxcloud.com)
+[![SBX](https://sbxcloud.com/www/api/base/powered-sbx__black.png)](https://sbxcloud.com)
 
 Welcome, this repo is the Angular 5 implementation of [sbxcorejs](https://github.com/sbxcloud/sbxcorejs) library.
 
@@ -31,7 +31,7 @@ export class AppModule {
   }
 }
 ```
-##### Also, you can initialize with Angular environment: 
+#### Also, you can initialize with Angular environment: 
 
 In environment.ts file:
 ```

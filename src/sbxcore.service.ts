@@ -545,10 +545,12 @@ export class SbxCoreService {
 export class AngularFind extends Find {
   private core;
   private url;
+  private totalpages: number;
   
   constructor(model: string, core: SbxCoreService, isFind: boolean) {
     super(model, isFind, SbxCoreService.environment.domain);
     this.core = core;
+    this.totalpages = 1;
     this.url = this.isFind ? this.core.$p(this.core.urls.find) : this.core.$p(this.core.urls.delete);
   }
   
