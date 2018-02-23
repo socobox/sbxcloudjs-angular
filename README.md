@@ -2,7 +2,7 @@
 
 [![SBX](https://sbxcloud.com/www/ibuyflowersdirect/powered.png)](https://sbxcloud.com)
 
-all the functions have the implementation with 'Promise' and with 'Rxjs', in case of using 'Promise', a polyfill of 'Promise' must be installed if the browser does not have 'Promise' implementation.
+All the functions have the implementation with 'Promise' and with 'Rxjs', in case of using 'Promise', a polyfill of 'Promise' must be installed if the browser does not have 'Promise' implementation.
 
 Examples of polyfill:
 - [es6-promise](https://github.com/stefanpenner/es6-promise)
