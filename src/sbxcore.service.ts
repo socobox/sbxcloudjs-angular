@@ -545,7 +545,7 @@ export class SbxCoreService {
 export class AngularFind extends Find {
   private core;
   private url;
-  private totalpages: number;
+  private totalpages;
   
   constructor(model: string, core: SbxCoreService, isFind: boolean) {
     super(model, isFind, SbxCoreService.environment.domain);
@@ -568,12 +568,12 @@ export class AngularFind extends Find {
   
   public thenRx(toFetch = []): Observable<any> {
     const option = {headers: this.core.getHeadersJSON() };
-    return this.core.httpClient.post(this.url, this.query.compile(), option).map(res => res as any).map(data => {
+    return this.core.httpClient.post(this.url, this.query.compile(), option).map(res => {
       if(toFetch.length) {
-        return this.mapFetchesResult(data, toFetch);
+        return this.mapFetchesResult(res, toFetch);
       }
-      return data;
-    });
+      return res;
+    }).map(res => res as any);
   }
   
   private find(query?: any) {
@@ -590,18 +590,17 @@ export class AngularFind extends Find {
     if (this.isFind) {
       this.setPageSize(100);
       const query = this.query.compile();
-      return this.thenRx(query)
-        .mergeMap(response => {
+      return this.thenRx().mergeMap(response => {
           this.totalpages = response.total_pages;
-          let i = 1;
-          const temp = [];
+          let i = 2;
+          const temp = [Observable.of(response)];
           while (i <= this.totalpages) {
             const queryAux = JSON.parse(JSON.stringify(query));
             queryAux.page = i;
             temp.push(this.find(queryAux));
             i = i + 1;
           }
-          return Observable.forkJoin(temp);
+          return Observable.forkJoin.apply(null, temp);
         })
         .map(res => res as any)
         .map((results) => {
