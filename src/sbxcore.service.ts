@@ -15,7 +15,7 @@ export class SbxCoreService {
   public static environment = { } as any;
   private headers: any;
 
-  private urls: any = {
+  public urls: any = {
     update_password: '/user/v1/password',
     login: '/user/v1/login',
     register: '/user/v1/register',
@@ -45,7 +45,7 @@ export class SbxCoreService {
     this.headers = new HttpHeaders()
       .set('App-Key', SbxCoreService.environment.appKey);
   }
-  
+
   public addHeaderAttr(name: string, value: string): void {
     this.headers = this.getHeaders().set(name, value);
   }
@@ -403,7 +403,7 @@ export class SbxCoreService {
   downloadFile(key: string) {
     return this.downloadFileRx(key).toPromise();
   }
-  
+
 
   /**
    * CLOUDSCRIPT
@@ -482,7 +482,7 @@ export class SbxCoreService {
     }
     return temp;
   }
-  
+
   /**
    * @deprecated Now you can parameterize the 'then' function with a fetch array
    * @param response the response of the server
@@ -546,18 +546,18 @@ export class AngularFind extends Find {
   private core;
   private url;
   private totalpages;
-  
+
   constructor(model: string, core: SbxCoreService, isFind: boolean) {
     super(model, isFind, SbxCoreService.environment.domain);
     this.core = core;
     this.totalpages = 1;
-    this.url = this.isFind ? this.core.$p(this.core.urls.find) : this.core.$p(this.core.urls.delete);
+    this.url = isFind ? core.$p(core.urls.find) : core.$p(core.urls.delete);
   }
-  
+
   /**
    * @param {Array} toFetch Optional params to auto map fetches result.
    */
-  
+
   public then(toFetch = []) {
     return this.thenRx(toFetch).toPromise();
   }
@@ -565,7 +565,7 @@ export class AngularFind extends Find {
   /**
    * @param {Array} toFetch Optional params to auto map fetches result.
    */
-  
+
   public thenRx(toFetch = []): Observable<any> {
     const option = {headers: this.core.getHeadersJSON() };
     return this.core.httpClient.post(this.url, this.query.compile(), option).map(res => {
@@ -575,13 +575,13 @@ export class AngularFind extends Find {
       return res;
     }).map(res => res as any);
   }
-  
+
   private find(query?: any) {
     const option = {headers: this.core.getHeadersJSON() };
     return this.core.httpClient.post(this.core.$p(this.core.urls.find),
       (query == null) ? this.query.compile() : query, option).map(res => res as any);
   }
-  
+
   public loadAll () {
     return this.loadAllRx().toPromise()
   }
