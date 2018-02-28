@@ -1,17 +1,18 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import QueryBuilder from 'sbx-querybuilder/index';
-import {Observable} from 'rxjs/Observable';
+import { Observable } from 'rxjs/Observable';
+import { Find } from 'sbxcorejs';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeMap';
+import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/observable/forkJoin';
 import 'rxjs/add/observable/of';
 
 @Injectable()
 export class SbxCoreService {
 
-
-  public static environment = {} as any;
+  public static environment = { } as any;
   private headers: any;
 
   private urls: any = {
@@ -35,18 +36,16 @@ export class SbxCoreService {
     cloudscript_run: '/cloudscript/v1/run'
   };
 
-  constructor(private httpClient: HttpClient) {
+  constructor(private httpClient: HttpClient) { }
 
-  }
-
-
-  public initialize(domain: number, baseUrl: string, appKey: string) {
+  public initialize(domain: number, appKey: string, baseUrl: string = 'https://sbxcloud.com/api') {
     SbxCoreService.environment.domain = domain;
     SbxCoreService.environment.baseUrl = baseUrl;
     SbxCoreService.environment.appKey = appKey;
     this.headers = new HttpHeaders()
       .set('App-Key', SbxCoreService.environment.appKey);
   }
+  
   public addHeaderAttr(name: string, value: string): void {
     this.headers = this.getHeaders().set(name, value);
   }
@@ -73,12 +72,9 @@ export class SbxCoreService {
 
   /**
    * @param {string} token
-   * @param {Callback} callBack
    */
-  validate(token: string,  callBack: Callback) {
-    const httpParams = new HttpParams().set('token', token) ;
-    const option = {headers: this.getHeadersJSON(), params: httpParams};
-    this.observableToCallBack(this.httpClient.get(this.$p(this.urls.validate), option), callBack);
+  validate(token: string) {
+    return this.validateRx(token).toPromise();
   }
 
   /**
@@ -115,17 +111,9 @@ export class SbxCoreService {
    * @param {string} email
    * @param {string} name
    * @param {string} password
-   * @param {Callback} callBack
    */
-  signUp(login: string, email: string, name: string, password: string, callBack: Callback) {
-    if (this.validateLogin(login) && this.validateEmail(email)) {
-      const option = {headers: this.getHeadersJSON()};
-      const params = '?email=' + this.encodeEmails(email) + '&password=' +  encodeURIComponent(password) + '&name='
-        + name + '&login=' + login + '&domain=' + SbxCoreService.environment.domain.toLocaleString();
-      this.observableToCallBack(this.httpClient.get(this.$p(this.urls.register) + params, option), callBack);
-    } else {
-      callBack.error({success: false, error: 'Login or email contains invalid characters. Letters, numbers and underscore are accepted'});
-    }
+  signUp(login: string, email: string, name: string, password: string) {
+    return this.signUpRx(login, email, name, password).toPromise();
   }
 
   /**
@@ -153,16 +141,8 @@ export class SbxCoreService {
    * @param {Callback} callBack
    * @param {domain}
    */
-  login(login: string, password: string, callBack: Callback, domain?: number) {
-    if ( (this.validateLogin(login) && login.indexOf('@') < 0) ||  (login.indexOf('@') >= 0 && this.validateEmail(login))) {
-      const option = {headers: this.getHeadersJSON()};
-      const params = '?login=' + this.encodeEmails(login) + '&password=' +
-        encodeURIComponent(password) + (domain ? '&domain=' + domain : '');
-      this.observableToCallBack(this.httpClient.get(this.$p(this.urls.login) + params, option), callBack);
-    } else {
-      callBack.error({success: false,
-        error: 'Login contains invalid characters. Letters, numbers and underscore are accepted'});
-    }
+  login(login: string, password: string, domain?: number) {
+    return this.loginRx(login, password, domain).toPromise();
   }
 
   /**
@@ -189,13 +169,9 @@ export class SbxCoreService {
    * @param {string} userEmail
    * @param {string} subject
    * @param {string} emailTemplate
-   * @param {Callback} callBack
    */
-  sendPasswordRequest(userEmail: string, subject: string, emailTemplate: string, callBack: Callback) {
-    const body =  {user_email: userEmail,
-      domain: SbxCoreService.environment.domain, subject: subject, email_template: emailTemplate};
-    const option = {headers: this.getHeadersJSON() };
-    this.observableToCallBack(this.httpClient.post(this.$p(this.urls.password), body, option), callBack);
+  sendPasswordRequest(userEmail: string, subject: string, emailTemplate: string) {
+    return this.sendPasswordRequestRx(userEmail, subject, emailTemplate).toPromise();
   }
 
   /**
@@ -217,15 +193,9 @@ export class SbxCoreService {
    * @param {number} userId
    * @param {number} userCode
    * @param {string} newPassword
-   * @param {Callback} callBack
    */
-  requestChangePassword(userId, userCode, newPassword, callBack) {
-    const body = {domain: SbxCoreService.environment.domain,
-      password: newPassword,
-      user_id: userId,
-      code: userCode};
-    const option = { headers: this.getHeadersJSON() };
-    this.observableToCallBack(this.httpClient.put(this.$p(this.urls.password), body, option), callBack);
+  requestChangePassword(userId, userCode, newPassword) {
+    return this.requestChangePasswordRx(userId, userCode, newPassword).toPromise();
   }
 
   /**
@@ -247,12 +217,9 @@ export class SbxCoreService {
   /**
    * change password
    * @param {string} newPassword
-   * @param {Callback} callBack
    */
-  changePassword(newPassword, callBack) {
-    const httpParams = new HttpParams().set('domain', SbxCoreService.environment.domain).set('password', newPassword);
-    const option = { headers: this.getHeadersJSON(), params: httpParams };
-    this.observableToCallBack(this.httpClient.get(this.$p(this.urls.update_password), option), callBack);
+  changePassword(newPassword) {
+    return this.changePasswordRx(newPassword).toPromise();
   }
 
   /**
@@ -273,24 +240,17 @@ export class SbxCoreService {
   /**
    * @param {string} model the name model in sbxcloud
    * @param data can be a JSON, or TypeScript Class or Array of both
-   * @param {Callback} callBack the Callback class to call
    */
-  insert(model: string, data: any, callBack: Callback) {
-    const body = this.queryBuilderToInsert(data).setModel(model).compile();
-    const option = {headers: this.getHeadersJSON() };
-    this.observableToCallBack(this.httpClient.post(this.$p(this.urls.row), body, option), callBack);
+  insert(model: string, data: any) {
+    return this.insertRx(model, data).toPromise();
   }
 
   /**
    * @param {string} model the name model in sbxcloud
    * @param data can be a JSON, or TypeScript Class or Array of both
-   * @param {Callback} callBack he Callback class to call
    */
-  update(model: string, data: any, callBack: Callback) {
-    const body = this.queryBuilderToInsert(data).setModel(model).compile();
-    const option = {headers: this.getHeadersJSON() };
-    this.observableToCallBack(this.httpClient.post(this.$p(this.urls.update), body, option), callBack);
-
+  update(model: string, data: any) {
+    return this.updateRx(model, data).toPromise();
   }
 
   /**
@@ -320,54 +280,27 @@ export class SbxCoreService {
    * @param {Callback} callBack
    */
   delete(model: string) {
-    return new Find(model, this, false);
+    return new AngularFind(model, this, false);
   }
 
   /**
    * @param {string} model the name model in sbxcloud
    * @param keys can be a string, a Class or array of both
-   * @param {Callback} callBack
    */
   find(model: string) {
-    return new Find(model, this, true);
+    return new AngularFind(model, this, true);
   }
 
 
   /**
    * @param {EmailData} data
-   * @param {Callback} callBack
    */
-  sendEmail(data: EmailData  , callBack: Callback) {
-    const mail = {
-      subject: data.subject,
-      to: data.to,
-      domain: SbxCoreService.environment.domain,
-      from: data.from,
-    } as any;
-    if (data.template) {
-      mail.html = data.template;
-    } else {
-      mail.template_key = data.template_key;
-    }
-    if (data.cc) {
-      mail.cc = data.cc;
-    }
-    if (data.bcc) {
-      mail.bcc = data.bcc;
-    }
-    if (data.data) {
-      mail.data = data.data;
-    }
-    const option = {headers: this.getHeadersJSON() };
-    this.observableToCallBack(this.httpClient.post(this.$p(this.urls.send_mail), mail, option), callBack);
+  sendEmail(data: EmailData) {
+    return this.sendEmailRx(data).toPromise();
   }
 
   /**
-   * @param {string} subject
-   * @param {string} to
-   * @param {string} from
-   * @param {string} body can be a html or a template
-   * @param {boolean} isTemplate
+   * @param {EmailData} data
    * @return {Observable<any>}
    */
   sendEmailRx(data: EmailData): Observable<any> {
@@ -398,12 +331,9 @@ export class SbxCoreService {
 
   /**
    * @param data
-   * @param {Callback} callBack
    */
-  paymentCustomer(data: Object, callBack: Callback) {
-    data['domain'] = SbxCoreService.environment.domain;
-    const option = {headers: this.getHeadersJSON() };
-    this.observableToCallBack(this.httpClient.post(this.$p(this.urls.payment_customer), data, option), callBack);
+  paymentCustomer(data: Object) {
+    return this.paymentCustomerRx(data).toPromise();
   }
 
   /**
@@ -418,12 +348,9 @@ export class SbxCoreService {
 
   /**
    * @param data
-   * @param {Callback} callBack
    */
-  paymentCard(data: Object, callBack: Callback) {
-    data['domain'] = SbxCoreService.environment.domain;
-    const option = {headers: this.getHeadersJSON() };
-    this.observableToCallBack(this.httpClient.post(this.$p(this.urls.payment_card), data, option), callBack);
+  paymentCard(data: Object) {
+    return this.paymentCardRx(data).toPromise();
   }
 
   /**
@@ -454,14 +381,9 @@ export class SbxCoreService {
    *
    * @param {string} key
    * @param file
-   * @param {Callback} callBack
    */
-  uploadFile(key: string, file: any, callBack: Callback) {
-    const input = new FormData();
-    input.append('file', file);
-    input.append('model', JSON.stringify({ key: key}));
-    const option = {headers: this.getHeaders() };
-    this.observableToCallBack(this.httpClient.post(this.$p(this.urls.uploadFile), input, option), callBack);
+  uploadFile(key: string, file: any) {
+    return this.uploadFileRx(key, file).toPromise();
   }
 
   /**
@@ -477,15 +399,11 @@ export class SbxCoreService {
   /**
    *
    * @param {string} key
-   * @param {Callback} callBack
    */
-  downloadFile(key: string, callBack: Callback) {
-    const httpParams = new HttpParams().set('action', 'download').set('key', key);
-    const option = {headers: this.getHeaders(), params: httpParams };
-    this.observableToCallBack(this.httpClient.get(this.$p(this.urls.downloadFile), option), callBack);
+  downloadFile(key: string) {
+    return this.downloadFileRx(key).toPromise();
   }
-
-
+  
 
   /**
    * CLOUDSCRIPT
@@ -505,11 +423,9 @@ export class SbxCoreService {
   /**
    * @param {string} key
    * @param params
-   * @param {Callback} callBack
    */
-  run(key: string, params: any, callBack: Callback) {
-    const option = {headers: this.getHeadersJSON() };
-    this.observableToCallBack(this.httpClient.post(this.$p(this.urls.cloudscript_run), { key: key, params: params }, option), callBack);
+  run(key: string, params: any) {
+    return this.runRx(key, params).toPromise();
   }
 
   /**
@@ -566,17 +482,9 @@ export class SbxCoreService {
     }
     return temp;
   }
-
-  public observableToCallBack(observable: Observable<Object>, callBack: Callback) {
-    observable.map(res => res as any)
-      .subscribe(response => {
-        callBack.ok(response);
-      }, error => {
-        callBack.error(error as any);
-      });
-  }
-
+  
   /**
+   * @deprecated Now you can parameterize the 'then' function with a fetch array
    * @param response the response of the server
    * @param {string[]} completefetch the array of fetch
    * @returns {any} the response with the union between fetch_results and results
@@ -634,477 +542,65 @@ export class SbxCoreService {
 
 }
 
-export class Callback {
-
-  public ok: any;
-  public error: any;
-
-  constructor(ok: (data: any) => any, error: (error: any) => any) {
-    this.ok = ok;
-    this.error = error;
-  }
-}
-
-export class Find {
-
-  public query;
+export class AngularFind extends Find {
   private core;
-  private isFind;
-  private lastANDOR?: string;
-  private totalpages: number;
-  private fecth: string[];
-
-
+  private url;
+  private totalpages;
+  
   constructor(model: string, core: SbxCoreService, isFind: boolean) {
-    this.query = new QueryBuilder()
-      .setDomain(SbxCoreService.environment.domain)
-      .setModel(model);
+    super(model, isFind, SbxCoreService.environment.domain);
     this.core = core;
-    this.isFind = isFind;
-    this.lastANDOR = null;
     this.totalpages = 1;
+    this.url = this.isFind ? this.core.$p(this.core.urls.find) : this.core.$p(this.core.urls.delete);
   }
-
-  public newGroupWithAnd() {
-    this.query.newGroup('AND');
-    this.lastANDOR = null;
-    return this;
-  }
-
-  public newGroupWithOr() {
-    this.query.newGroup('OR');
-    this.lastANDOR = null;
-    return this;
+  
+  /**
+   * @param {Array} toFetch Optional params to auto map fetches result.
+   */
+  
+  public then(toFetch = []) {
+    return this.thenRx(toFetch).toPromise();
   }
 
   /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
+   * @param {Array} toFetch Optional params to auto map fetches result.
    */
-  public andWhereIsEqual(field: string, value: any) {
-    this.lastANDOR =  'AND';
-    this.query.addCondition(this.lastANDOR, field, '=', value);
-    return this;
-  }
-
-  /**
-   * @param {string} field
-   * @return {Find}
-   */
-  public andWhereIsNotNull(field: string) {
-    this.lastANDOR = 'AND';
-    this.query.addCondition(this.lastANDOR, field, 'IS NOT', null);
-    return this;
-  }
-
-  /**
-   * @param {string} field
-   * @return {Find}
-   */
-  public andWhereIsNull(field: string) {
-    this.lastANDOR = 'AND';
-    this.query.addCondition(this.lastANDOR, field, 'IS', null);
-    return this;
-  }
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   */
-  public andWhereGreaterThan(field: string, value: any) {
-    this.lastANDOR = 'AND';
-    this.query.addCondition(this.lastANDOR, field, '>', value);
-    return this;
-  }
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   */
-  public andWhereLessThan(field: string, value: any) {
-    this.lastANDOR = 'AND';
-    this.query.addCondition(this.lastANDOR, field, '<', value);
-    return this;
-  }
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   */
-  public andWhereGreaterOrEqualThan(field: string, value: any) {
-    this.lastANDOR = 'AND';
-    this.query.addCondition(this.lastANDOR, field, '>=', value);
-    return this;
-  }
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   */
-  public andWhereLessOrEqualThan(field: string, value: any) {
-    this.lastANDOR = 'AND';
-    this.query.addCondition(this.lastANDOR, field, '<=', value);
-    return this;
-  }
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   */
-  public andWhereIsNotEqual(field: string, value: any) {
-    this.lastANDOR = 'AND';
-    this.query.addCondition(this.lastANDOR, field, '!=', value);
-    return this;
-  }
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   */
-  public andWhereStartsWith(field: string, value: string) {
-    this.lastANDOR = 'AND';
-    value = value && value.length > 0 ? `%${value}` : value;
-    this.query.addCondition(this.lastANDOR, field, 'LIKE', value);
-    return this;
-  }
-
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   */
-  public andWhereEndsWith(field: string, value: string) {
-    this.lastANDOR = 'AND';
-    value = value && value.length > 0 ? `${value}%` : value;
-    this.query.addCondition(this.lastANDOR, field, 'LIKE', value);
-    return this;
-  }
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   */
-  public andWhereContains(field: string, value: string) {
-    this.lastANDOR = 'AND';
-    value = value && value.length > 0 ? `%${value.split(' ').join('%')}%` : value;
-    this.query.addCondition(this.lastANDOR, field, 'LIKE', value);
-    return this;
-  }
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   */
-  public andWhereIn(field: string, value: any) {
-    this.lastANDOR = 'AND';
-    this.query.addCondition(this.lastANDOR, field, 'IN', value);
-    return this;
-  }
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   */
-  public andWhereNotIn(field: string, value: any) {
-    this.lastANDOR = 'AND';
-    this.query.addCondition(this.lastANDOR, field, 'NOT IN', value);
-    return this;
-  }
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   */
-  public orWhereIsEqual(field: string, value: any) {
-    this.lastANDOR = (this.lastANDOR == null) ? 'AND' : 'OR';
-    this.query.addCondition(this.lastANDOR, field, '=', value);
-    return this;
-  }
-
-  /**
-   * @param {string} field
-   * @return {Find}
-   */
-  public orWhereIsNotNull(field: string) {
-    this.lastANDOR = (this.lastANDOR == null) ? 'AND' : 'OR';
-    this.query.addCondition(this.lastANDOR, field, 'IS NOT', null);
-    return this;
-  }
-
-  /**
-   * @param {string} field
-   * @return {Find}
-   */
-  public orWhereIsNull(field: string) {
-    this.lastANDOR = (this.lastANDOR == null) ? 'AND' : 'OR';
-    this.query.addCondition(this.lastANDOR, field, 'IS', null);
-    return this;
-  }
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   */
-  public orWhereGreaterThan(field: string, value: any) {
-    this.lastANDOR = (this.lastANDOR == null) ? 'AND' : 'OR';
-    this.query.addCondition(this.lastANDOR, field, '>', value);
-    return this;
-  }
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   */
-  public orWhereLessThan(field: string, value: any) {
-    this.lastANDOR = (this.lastANDOR == null) ? 'AND' : 'OR';
-    this.query.addCondition(this.lastANDOR, field, '<', value);
-    return this;
-  }
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   */
-  public orWhereGreaterOrEqualThan(field: string, value: any) {
-    this.lastANDOR = (this.lastANDOR == null) ? 'AND' : 'OR';
-    this.query.addCondition(this.lastANDOR, field, '>=', value);
-    return this;
-  }
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   */
-  public orWhereLessOrEqualThan(field: string, value: any) {
-    this.lastANDOR = (this.lastANDOR == null) ? 'AND' : 'OR';
-    this.query.addCondition(this.lastANDOR, field, '<=', value);
-    return this;
-  }
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   */
-  public orWhereIsNotEqual(field: string, value: any) {
-    this.lastANDOR = (this.lastANDOR == null) ? 'AND' : 'OR';
-    this.query.addCondition(this.lastANDOR, field, '!=', value);
-    return this;
-  }
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   */
-  public orWhereStartsWith(field: string, value: string) {
-    this.lastANDOR = (this.lastANDOR == null) ? 'AND' : 'OR';
-    value = value && value.length > 0 ? `%${value}` : value;
-    this.query.addCondition(this.lastANDOR, field, 'LIKE', value);
-    return this;
-  }
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   */
-  public orWhereEndsWith(field: string, value: string) {
-    this.lastANDOR = (this.lastANDOR == null) ? 'AND' : 'OR';
-    value = value && value.length > 0 ? `${value}%` : value;
-    this.query.addCondition(this.lastANDOR, field, 'LIKE', value);
-    return this;
-  }
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   */
-  public orWhereContains(field: string, value: string) {
-    this.lastANDOR = (this.lastANDOR == null) ? 'AND' : 'OR';
-    // if the user sends null or empty, there will be no wildcar placed.
-    value = value && value.length > 0 ? `%${value.split(' ').join('%')}%` : value;
-    this.query.addCondition(this.lastANDOR, field, 'LIKE', value);
-    return this;
-  }
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   */
-  public orWhereIn(field: string, value: any) {
-    this.lastANDOR = (this.lastANDOR == null) ? 'AND' : 'OR';
-    this.query.addCondition(this.lastANDOR, field, 'IN', value);
-    return this;
-  }
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   */
-  public orWhereNotIn(field: string, value: any) {
-    this.lastANDOR = (this.lastANDOR == null) ? 'AND' : 'OR';
-    this.query.addCondition(this.lastANDOR, field, 'NOT IN', value);
-    return this;
-  }
-
-  /**
-   * Reference Join between two model
-   * @param {string} field column name of principal model
-   * @param {string} referenceField column name of subQuery
-   */
-  public orWhereReferenceJoinBetween(field: string, referenceField: string) {
-    return new ReferenceJoin(this, field, referenceField, 'OR');
-  }
-
-  /**
-   * Reference Join between two model
-   * @param {string} field column name of principal model
-   * @param {string} referenceField column name of subQuery
-   */
-  public andWhereReferenceJoinBetween(field: string, referenceField: string) {
-    return new ReferenceJoin(this, field, referenceField, 'AND');
-  }
-
-  public whereWithKeys(keys) {
-    this.query.whereWithKeys(this.core.validateKeys(keys));
-    return this;
-  }
-
-  /**
-   * @param {string} field
-   * @param asc
-   * @return {Find}
-   */
-  public orderBy(field: string, asc: Boolean= false) {
-    this.query.orderBy(  field, asc);
-    return this;
-  }
-
-  public fetchModels(array: string[]) {
-    if (this.isFind) {
-      this.query.fetchModels(array);
-      this.fecth = array;
-    }
-    return this;
-  }
-
-  public then(callBack: Callback, query?: any) {
+  
+  public thenRx(toFetch = []): Observable<any> {
     const option = {headers: this.core.getHeadersJSON() };
-    this.core.observableToCallBack(this.core.httpClient.post(this.isFind ? this.core.$p(this.core.urls.find)
-      : this.core.$p(this.core.urls.delete),
-      (query == null) ? this.query.compile() : query, option), callBack);
+    return this.core.httpClient.post(this.url, this.query.compile(), option).map(res => {
+      if(toFetch.length) {
+        return this.mapFetchesResult(res, toFetch);
+      }
+      return res;
+    }).map(res => res as any);
   }
-
-  public thenRx(query?: any): Observable<any> {
-    const option = {headers: this.core.getHeadersJSON() };
-    return this.core.httpClient.post(this.isFind ? this.core.$p(this.core.urls.find) : this.core.$p(this.core.urls.delete),
-      (query == null) ? this.query.compile() : query, option).map(res => res as any);
-  }
-
-  public setPage(page: number) {
-    this.query.setPage(page);
-    return this;
-  }
-
-  public setPageSize(limit: number) {
-    this.query.setPageSize(limit);
-    return this;
-  }
-
+  
   private find(query?: any) {
     const option = {headers: this.core.getHeadersJSON() };
-    return  this.core.httpClient.post(this.core.$p(this.core.urls.find),
+    return this.core.httpClient.post(this.core.$p(this.core.urls.find),
       (query == null) ? this.query.compile() : query, option).map(res => res as any);
-
   }
-
-  public loadAll (callBack: Callback) {
-    if (this.isFind) {
-      this.setPageSize(100);
-      const query = this.query.compile();
-      this.then(new Callback(response => {
-        this.totalpages = response.total_pages;
-        let i = 1;
-        const temp = [];
-        while (i <= this.totalpages) {
-          const queryAux = JSON.parse(JSON.stringify(query));
-          queryAux.page = i;
-          temp.push(this.find(queryAux));
-          i = i + 1;
-        }
-        Observable.forkJoin(temp)
-          .map(res => res as any).subscribe(results => {
-            let result = [];
-            const fetched_results = {};
-            results.forEach(array => {
-              const v = array as any;
-              result = result.concat(v.results);
-              if (v.fetched_results) {
-                const objs = Object.keys(v.fetched_results);
-                for (let k = 0; k < objs.length; k++) {
-                  const type_name =  objs[k];
-                  if (!fetched_results.hasOwnProperty(type_name)) {
-                    fetched_results[type_name] = {};
-                  }
-                  const keys = Object.keys(v.fetched_results[type_name]);
-                  for (let j = 0; j < keys.length; j++) {
-                    const key = keys[j];
-                    if (v.fetched_results[type_name].hasOwnProperty(key)) {
-                      fetched_results[type_name][key] = v.fetched_results[type_name][key];
-                    }
-                  }
-
-                }
-
-              }
-            });
-            callBack.ok({success: true, results: result, fetched_results: fetched_results});
-          },
-          error2 => {
-            callBack.error(error2 as any);
-          });
-      }, error2 => {callBack.error(error2 as any); } ), query);
-    } else {
-      this.then(callBack);
-    }
+  
+  public loadAll () {
+    return this.loadAllRx().toPromise()
   }
 
   public loadAllRx () {
     if (this.isFind) {
       this.setPageSize(100);
       const query = this.query.compile();
-      return this.thenRx(query)
-        .mergeMap(response => {
+      return this.thenRx().mergeMap(response => {
           this.totalpages = response.total_pages;
-          let i = 1;
-          const temp = [];
+          let i = 2;
+          const temp = [Observable.of(response)];
           while (i <= this.totalpages) {
             const queryAux = JSON.parse(JSON.stringify(query));
             queryAux.page = i;
             temp.push(this.find(queryAux));
             i = i + 1;
           }
-          return Observable.forkJoin(temp);
+          return Observable.forkJoin.apply(null, temp);
         })
         .map(res => res as any)
         .map((results) => {
@@ -1127,179 +623,15 @@ export class Find {
                     fetched_results[type_name][key] = v.fetched_results[type_name][key];
                   }
                 }
-
               }
-
             }
           });
           return {success: true, results: result, fetched_results: fetched_results};
         });
     }else {
       return this.thenRx();
-    }}
-}
-
-export class ReferenceJoin {
-
-  private find: Find;
-  private field: string;
-  private referenceField: string;
-
-  constructor(find: Find, field: string, referenceField: string, type: string) {
-    this.find = find;
-    this.field = field;
-    this.referenceField = referenceField;
-    if (type === 'AND') {
-      this.find.andWhereIn(this.field, '@reference_join@');
-    } else {
-      this.find.orWhereIn(this.field, '@reference_join@');
     }
   }
-
-  /**
-   * set model to Join
-   * @param {string} referenceModel
-   * @return {FilterJoin}
-   */
-  public in(referenceModel: string) {
-    return new FilterJoin(this.find, this.field, this.referenceField, referenceModel);
-  }
-}
-
-
-export class FilterJoin {
-
-  private find: Find;
-  private field: string;
-  private referenceField: string;
-  private referenceModel: string;
-
-
-  constructor(find: Find, field: string, referenceField: string, referenceModel: string) {
-    this.find = find;
-    this.field = field;
-    this.referenceField = referenceField;
-    this.referenceModel = referenceModel;
-  }
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   */
-  public filterWhereIsEqual(field: string, value: any) {
-    this.find.query.setReferenceJoin('=', this.field, this.referenceField, this.referenceModel, value);
-    return this.find;
-  }
-
-  /**
-   * @param {string} field
-   * @return {Find}
-   * @constructor
-   */
-  public FilterWhereIsNotNull(field: string) {
-    this.find.query.setReferenceJoin('IS NOT', this.field, this.referenceField, this.referenceModel, null);
-    return this.find;
-  }
-
-  /**
-   * @param {string} field
-   * @return {Find}
-   * @constructor
-   */
-  public FilterWhereIsNull(field: string) {
-    this.find.query.setReferenceJoin('IS', this.field, this.referenceField, this.referenceModel, null);
-    return this.find;
-  }
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   * @constructor
-   */
-  public FilterWhereGreaterThan(field: string, value: any) {
-    this.find.query.setReferenceJoin('>', this.field, this.referenceField, this.referenceModel, value);
-    return this.find;
-  }
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   * @constructor
-   */
-  public FilterWhereLessThan(field: string, value: any) {
-    this.find.query.setReferenceJoin('<', this.field, this.referenceField, this.referenceModel, value);
-    return this.find;
-  }
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   * @constructor
-   */
-  public FilterWhereGreaterOrEqualThan(field: string, value: any) {
-    this.find.query.setReferenceJoin('>=', this.field, this.referenceField, this.referenceModel, value);
-    return this.find;
-  }
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   * @constructor
-   */
-  public FilterWhereLessOrEqualThan(field: string, value: any) {
-    this.find.query.setReferenceJoin('<=', this.field, this.referenceField, this.referenceModel, value);
-    return this.find;
-  }
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   * @constructor
-   */
-  public FilterWhereIsNotEqual(field: string, value: any) {
-    this.find.query.setReferenceJoin('!=', this.field, this.referenceField, this.referenceModel, value);
-    return this.find;
-  }
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   * @constructor
-   */
-  public FilterWhereLike(field: string, value: any) {
-    this.find.query.setReferenceJoin('LIKE', this.field, this.referenceField, this.referenceModel, value);
-    return this.find;
-  }
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   * @constructor
-   */
-  public FilterWhereIn(field: string, value: any) {
-    this.find.query.setReferenceJoin('IN', this.field, this.referenceField, this.referenceModel, value);
-    return this.find;
-  }
-
-  /**
-   * @param {string} field
-   * @param value
-   * @return {Find}
-   * @constructor
-   */
-  public FilterWhereNotIn(field: string, value: any) {
-    this.find.query.setReferenceJoin('NOT IN', this.field, this.referenceField, this.referenceModel, value);
-    return this.find;
-  }
-
 }
 
 export interface EmailData {

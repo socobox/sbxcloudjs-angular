@@ -1,13 +1,12 @@
 import { Injectable } from '@angular/core';
-import {Callback, SbxCoreService} from '../sbxcore.service';
+import {SbxCoreService} from '../sbxcore.service';
 import {CookieService} from 'ngx-cookie-service';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeMap';
+import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/forkJoin';
-
-
 
 @Injectable()
 export class SbxSessionService {
@@ -21,8 +20,8 @@ export class SbxSessionService {
   private _user: User;
 
 
-  public initialize(domain: number, baseUrl: string, appKey: string) {
-    this.sbxCoreService.initialize(domain, baseUrl, appKey);
+  public initialize(domain: number, appKey: string) {
+    this.sbxCoreService.initialize(domain, appKey);
     this.islogged();
   }
 
@@ -31,7 +30,7 @@ export class SbxSessionService {
    * @param environment (domain, base_url, appkey)
    */
   public initializeWithEnvironment(environment: any) {
-    this.sbxCoreService.initialize(environment.domain, environment.baseUrl, environment.appKey);
+    this.sbxCoreService.initialize(environment.domain, environment.appKey, environment.baseUrl);
     this.islogged();
   }
 
@@ -66,8 +65,6 @@ export class SbxSessionService {
     this.cookieService.set(this.cookieToken, token, new Date(today + this.daysToExpire * SbxSessionService.day));
   }
 
-
-
   private updateUser(data: any) {
     this.getCurrentUser().token = data.token;
     this.getCurrentUser().id = data.user.id;
@@ -81,15 +78,8 @@ export class SbxSessionService {
    * Auth user methods
    */
 
-  login(login: string, password: string, callBack: Callback, domain?: number): void {
-    this.sbxCoreService.login(login,
-      password, new Callback(
-        data => {
-          if (data.success) {
-            this.updateUser(data);
-          }
-          callBack.ok(data);
-        }, callBack.error), domain);
+  login(login: string, password: string, domain?: number) {
+    return this.loginRx(login, password, domain).toPromise();
   }
 
   loginRx(login: string, password: string, domain?: number) {
@@ -102,16 +92,8 @@ export class SbxSessionService {
       });
   }
 
-  validate(token: string, callBack: Callback): void {
-    this.sbxCoreService.validate(token, new Callback(
-      data => {
-        if (data.success) {
-          data.token = token;
-          this.updateUser(data);
-        }
-        callBack.ok(data);
-      }, callBack.error));
-
+  validate(token: string) {
+    this.validateRx(token).toPromise();
   }
 
   validateRx(token: string ) {
@@ -131,16 +113,8 @@ export class SbxSessionService {
     this._user = null;
   }
 
-  signUp(login: string, email: string, name: string, password: string, callBack: Callback): void {
-    this.sbxCoreService.signUp(login, email,
-      name,
-      password, new Callback(
-        data => {
-          if (data.success) {
-            this.updateUser(data);
-          }
-          callBack.ok(data);
-        }, callBack.error));
+  signUp(login: string, email: string, name: string, password: string) {
+    return this.signUpRx(login, email, name, password).toPromise();
   }
 
   signUpRx(login: string, email: string, name: string, password: string) {
