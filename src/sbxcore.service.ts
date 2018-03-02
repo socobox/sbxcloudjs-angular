@@ -4,10 +4,13 @@ import QueryBuilder from 'sbx-querybuilder/index';
 import { Observable } from 'rxjs/Observable';
 import { Find } from 'sbxcorejs';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/mergeAll';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/toPromise';
+import 'rxjs/add/operator/toArray';
 import 'rxjs/add/observable/forkJoin';
 import 'rxjs/add/observable/of';
+import 'rxjs/add/observable/merge';
 
 @Injectable()
 export class SbxCoreService {
@@ -600,7 +603,7 @@ export class AngularFind extends Find {
             temp.push(this.find(queryAux));
             i = i + 1;
           }
-          return Observable.forkJoin.apply(null, temp);
+          return Observable.merge(temp).mergeAll(5).toArray();
         })
         .map(res => res as any)
         .map((results) => {

@@ -14,10 +14,13 @@ export default {
         'ngx-cookie-service': 'ngxCookieService',
 		'rxjs/Observable': 'Rx',
 		'rxjs/add/operator/map': 'Rx.Observable.prototype',
+		'rxjs/add/operator/mergeAll': 'Rx.Observable.prototype',
 		'rxjs/add/operator/mergeMap': 'Rx.Observable.prototype',
 		'rxjs/add/operator/toPromise': 'Rx.Observable.prototype',
+		'rxjs/add/operator/toArray': 'Rx.Observable.prototype',
 		'rxjs/add/observable/of': 'Rx.Observable',
-		'rxjs/add/observable/forkJoin': 'Rx.Observable'
+		'rxjs/add/observable/forkJoin': 'Rx.Observable',
+		'rxjs/add/observable/merge': 'Rx.Observable'
 	},
     external: [
         '@angular/core',
@@ -29,9 +32,12 @@ export default {
         'ngx-cookie-service',
         'rxjs/Observable',
         'rxjs/add/operator/map',
+        'rxjs/add/operator/mergeAll',
         'rxjs/add/operator/mergeMap',
         'rxjs/add/operator/toPromise',
+        'rxjs/add/operator/toArray',
         'rxjs/add/observable/of',
-        'rxjs/add/observable/forkJoin'
+        'rxjs/add/observable/forkJoin',
+        'rxjs/add/observable/merge'
 	]
 }
