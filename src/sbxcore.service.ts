@@ -243,26 +243,29 @@ export class SbxCoreService {
   /**
    * @param {string} model the name model in sbxcloud
    * @param data can be a JSON, or TypeScript Class or Array of both
+   *  @param letNull let null data
    */
-  insert(model: string, data: any) {
-    return this.insertRx(model, data).toPromise();
+  insert(model: string, data: any, letNull?: Boolean) {
+    return this.insertRx(model, data, letNull).toPromise();
   }
 
   /**
    * @param {string} model the name model in sbxcloud
    * @param data can be a JSON, or TypeScript Class or Array of both
+   * @param letNull let null data
    */
-  update(model: string, data: any) {
-    return this.updateRx(model, data).toPromise();
+  update(model: string, data: any, letNull?: Boolean) {
+    return this.updateRx(model, data, letNull).toPromise();
   }
 
   /**
    * @param {string} model the name model in sbxcloud
    * @param data can be a JSON, or TypeScript Class or Array of both
+   * @param letNull let null data
    * @return {Observable}
    */
-  insertRx(model: string, data: any): Observable<any> {
-    const body = this.queryBuilderToInsert(data).setModel(model).compile();
+  insertRx(model: string, data: any, letNull?: Boolean): Observable<any> {
+    const body = this.queryBuilderToInsert(data, letNull).setModel(model).compile();
     const option = {headers: this.getHeadersJSON() };
     return this.httpClient.post(this.$p(this.urls.row), body, option).map(res => res as any);
   }
@@ -270,10 +273,11 @@ export class SbxCoreService {
   /**
    * @param {string} model the name model in sbxcloud
    * @param data can be a JSON, or TypeScript Class or Array of both
+   * @param letNull let null data
    * @return {Observable}
    */
-  updateRx(model: string, data: any): Observable<any> {
-    const body = this.queryBuilderToInsert(data).setModel(model).compile();
+  updateRx(model: string, data: any, letNull?: Boolean): Observable<any> {
+    const body = this.queryBuilderToInsert(data, letNull).setModel(model).compile();
     const option = {headers: this.getHeadersJSON() };
     return this.httpClient.post(this.$p(this.urls.update), body, option).map(res => res as any);
   }
@@ -435,29 +439,29 @@ export class SbxCoreService {
    * UTILS
    */
 
-  private queryBuilderToInsert(data): any {
+  private queryBuilderToInsert(data, letNull?: Boolean): any {
     const query =   new QueryBuilder()
       .setDomain(SbxCoreService.environment.domain);
     if (Array.isArray(data) ) {
       data.forEach(item => {
-        query.addObject(this.validateData(item));
+        query.addObject(this.validateData(item, letNull));
       });
     }else {
-      query.addObject(this.validateData(data));
+      query.addObject(this.validateData(data, letNull));
     }
     return query;
   }
 
-  public validateData(data: any): any {
+  public validateData(data: any, letNull?: Boolean): any {
     const temp = {};
     Object.keys(data)
       .filter(key => {
         const v = data[key];
-        return (Array.isArray(v) || typeof v === 'string') ?
+        return (((Array.isArray(v) || typeof v === 'string') ?
           (v.length > 0) :
-          (v !== null && v !== undefined);
+          (v !== null && v !== undefined)) || letNull);
       }).forEach(key => {
-      if (data[key]._KEY != null) {
+      if ( (data[key] !== null && data[key] !== undefined)  && data[key]._KEY != null) {
         data[key] = data[key]._KEY;
       }
       const key2 = (key !== '_KEY') ? key.replace(/^_/, '') : key;
@@ -586,7 +590,7 @@ export class AngularFind extends Find {
   }
 
   public loadAll () {
-    return this.loadAllRx().toPromise()
+    return this.loadAllRx().toPromise();
   }
 
   public loadAllRx () {
