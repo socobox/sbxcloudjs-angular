@@ -555,7 +555,7 @@ export class AngularFind extends Find {
   private totalpages;
 
   constructor(model: string, core: SbxCoreService, isFind: boolean) {
-    super(model, isFind, SbxCoreService.environment.domain);
+    super(model, SbxCoreService.environment.domain);
     this.core = core;
     this.totalpages = 1;
     this.url = isFind ? core.$p(core.urls.find) : core.$p(core.urls.delete);
