@@ -578,7 +578,7 @@ export class AngularFind extends Find {
   public thenRx(toFetch = []): Observable<any> {
     const option = {headers: this.core.getHeadersJSON() };
     return this.core.httpClient.post(this.url, this.query.compile(), option).map(res => {
-      if(toFetch.length) {
+      if (toFetch.length && this.isFind) {
         return this.mapFetchesResult(res, toFetch);
       }
       return res;
@@ -595,7 +595,7 @@ export class AngularFind extends Find {
     return this.loadAllRx().toPromise();
   }
 
-  public loadAllRx () {
+  public loadAllRx (toFetch = []) {
     if (this.isFind) {
       this.setPageSize(100);
       const query = this.query.compile();
@@ -632,6 +632,9 @@ export class AngularFind extends Find {
                     fetched_results[type_name][key] = v.fetched_results[type_name][key];
                   }
                 }
+              }
+              if (toFetch.length) {
+                result = this.mapFetchesResult(result, toFetch);
               }
             }
           });
