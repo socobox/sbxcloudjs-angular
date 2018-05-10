@@ -553,6 +553,7 @@ export class AngularFind extends Find {
   private core;
   private url;
   private totalpages;
+  public isFind;
 
   constructor(model: string, core: SbxCoreService, isFind: boolean) {
     super(model, SbxCoreService.environment.domain);
