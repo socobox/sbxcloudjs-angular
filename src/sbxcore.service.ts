@@ -567,7 +567,7 @@ export class AngularFind extends Find {
    * @param {Array} toFetch Optional params to auto map fetches result.
    */
 
-  public then(toFetch = []) {
+  public toPromise(toFetch = []) {
     return this.thenRx(toFetch).toPromise();
   }
 
