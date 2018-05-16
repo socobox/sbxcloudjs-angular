@@ -1,16 +1,12 @@
+
+import {merge as observableMerge, of as observableOf,  Observable } from 'rxjs';
+import {toArray, mergeAll, map, mergeMap} from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import QueryBuilder from 'sbx-querybuilder/index';
-import { Observable } from 'rxjs/Observable';
 import { Find } from 'sbxcorejs';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/mergeAll';
-import 'rxjs/add/operator/mergeMap';
-import 'rxjs/add/operator/toPromise';
-import 'rxjs/add/operator/toArray';
-import 'rxjs/add/observable/forkJoin';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/observable/merge';
+
+
 
 @Injectable()
 export class SbxCoreService {
@@ -87,7 +83,7 @@ export class SbxCoreService {
   validateRx(token: string): Observable<any> {
     const httpParams = new HttpParams().set('token', token) ;
     const option = {headers: this.getHeadersJSON(), params: httpParams};
-    return this.httpClient.get(this.$p(this.urls.validate), option).map(data => data as any) ;
+    return this.httpClient.get(this.$p(this.urls.validate), option).pipe(map(data => data as any)) ;
   }
 
   private encodeEmails(email: string) {
@@ -131,9 +127,9 @@ export class SbxCoreService {
       const option = {headers: this.getHeadersJSON()};
       const params = '?email=' + this.encodeEmails(email) + '&password=' +  encodeURIComponent(password) + '&name='
         + name + '&login=' + login + '&domain=' + SbxCoreService.environment.domain.toLocaleString();
-      return this.httpClient.get(this.$p(this.urls.register) + params, option).map(data => data as any);
+      return this.httpClient.get(this.$p(this.urls.register) + params, option).pipe(map(data => data as any));
     } else {
-      return Observable.of({success: false,
+      return observableOf({success: false,
         error: 'Login or email contains invalid characters. Letters, numbers and underscore are accepted'});
     }
   }
@@ -159,9 +155,9 @@ export class SbxCoreService {
       const option = {headers: this.getHeadersJSON()};
       const params = '?login=' + this.encodeEmails(login) + '&password=' + encodeURIComponent(password)
         + (domain ? '&domain=' + domain : '');
-      return this.httpClient.get(this.$p(this.urls.login) + params, option).map(data => data as any);
+      return this.httpClient.get(this.$p(this.urls.login) + params, option).pipe(map(data => data as any));
     }else {
-      return Observable.of({success: false,
+      return observableOf({success: false,
         error: 'Login contains invalid characters. Letters, numbers and underscore are accepted'});
     }
   }
@@ -188,7 +184,7 @@ export class SbxCoreService {
     const body =  {user_email: userEmail,
       domain: SbxCoreService.environment.domain, subject: subject, email_template: emailTemplate};
     const option = {headers: this.getHeadersJSON() };
-    return this.httpClient.post(this.$p(this.urls.password), body, option).map( data => data as any);
+    return this.httpClient.post(this.$p(this.urls.password), body, option).pipe(map( data => data as any));
   }
 
   /**
@@ -214,7 +210,7 @@ export class SbxCoreService {
       user_id: userId,
       code: userCode};
     const option = { headers: this.getHeadersJSON()};
-    return this.httpClient.put(this.$p(this.urls.password), body , option).map(data => data);
+    return this.httpClient.put(this.$p(this.urls.password), body , option).pipe(map(data => data));
   }
 
   /**
@@ -233,7 +229,7 @@ export class SbxCoreService {
   changePasswordRx(newPassword) {
     const httpParams = new HttpParams().set('domain', SbxCoreService.environment.domain).set('password', newPassword);
     const option = { headers: this.getHeadersJSON(), params: httpParams };
-    return this.httpClient.get(this.$p(this.urls.update_password), option).map(data => data);
+    return this.httpClient.get(this.$p(this.urls.update_password), option).pipe(map(data => data));
   }
 
   /***
@@ -267,7 +263,7 @@ export class SbxCoreService {
   insertRx(model: string, data: any, letNull?: Boolean): Observable<any> {
     const body = this.queryBuilderToInsert(data, letNull).setModel(model).compile();
     const option = {headers: this.getHeadersJSON() };
-    return this.httpClient.post(this.$p(this.urls.row), body, option).map(res => res as any);
+    return this.httpClient.post(this.$p(this.urls.row), body, option).pipe(map(res => res as any));
   }
 
   /**
@@ -279,7 +275,7 @@ export class SbxCoreService {
   updateRx(model: string, data: any, letNull?: Boolean): Observable<any> {
     const body = this.queryBuilderToInsert(data, letNull).setModel(model).compile();
     const option = {headers: this.getHeadersJSON() };
-    return this.httpClient.post(this.$p(this.urls.update), body, option).map(res => res as any);
+    return this.httpClient.post(this.$p(this.urls.update), body, option).pipe(map(res => res as any));
   }
   /**
    * @param {string} model the name model in sbxcloud
@@ -332,7 +328,7 @@ export class SbxCoreService {
       mail.data = data.data;
     }
     const option = {headers: this.getHeadersJSON() };
-    return this.httpClient.post(this.$p(this.urls.send_mail), mail, option).map(res => res as any);
+    return this.httpClient.post(this.$p(this.urls.send_mail), mail, option).pipe(map(res => res as any));
   }
 
 
@@ -350,7 +346,7 @@ export class SbxCoreService {
   paymentCustomerRx(data: Object): Observable<any> {
     data['domain'] = SbxCoreService.environment.domain;
     const option = {headers: this.getHeadersJSON() };
-    return this.httpClient.post(this.$p(this.urls.payment_customer), data, option).map(res => res as any);
+    return this.httpClient.post(this.$p(this.urls.payment_customer), data, option).pipe(map(res => res as any));
   }
 
   /**
@@ -367,7 +363,7 @@ export class SbxCoreService {
   paymentCardRx(data: Object): Observable<any> {
     data['domain'] = SbxCoreService.environment.domain;
     const option = {headers: this.getHeadersJSON() };
-    return this.httpClient.post(this.$p(this.urls.payment_card), data, option).map(res => res as any);
+    return this.httpClient.post(this.$p(this.urls.payment_card), data, option).pipe(map(res => res as any));
   }
 
 
@@ -381,7 +377,7 @@ export class SbxCoreService {
     input.append('file', file);
     input.append('model', JSON.stringify({ key: key}));
     const option = {headers: this.getHeaders() };
-    return this.httpClient.post(this.$p(this.urls.uploadFile), input, option).map(res => res as any);
+    return this.httpClient.post(this.$p(this.urls.uploadFile), input, option).pipe(map(res => res as any));
   }
 
   /**
@@ -400,7 +396,7 @@ export class SbxCoreService {
   downloadFileRx(key: string): Observable<any> {
     const httpParams = new HttpParams().set('action', 'download').set('key', key);
     const option = {headers: this.getHeaders(), params: httpParams };
-    return this.httpClient.get(this.$p(this.urls.downloadFile), option).map(res => res as any);
+    return this.httpClient.get(this.$p(this.urls.downloadFile), option).pipe(map(res => res as any));
   }
 
   /**
@@ -424,7 +420,7 @@ export class SbxCoreService {
    */
   runRx(key: string, params: any): Observable<any> {
     const option = {headers: this.getHeadersJSON() };
-    return this.httpClient.post(this.$p(this.urls.cloudscript_run), { key: key, params: params }, option).map(res => res as any);
+    return this.httpClient.post(this.$p(this.urls.cloudscript_run), { key: key, params: params }, option).pipe(map(res => res as any));
   }
 
   /**
@@ -599,23 +595,23 @@ export class AngularFind extends Find {
     if (this.isFind) {
       this.setPageSize(100);
       const query = this.query.compile();
-      return this.thenRx().mergeMap(response => {
-          this.totalpages = response.total_pages;
+      return this.thenRx().pipe(mergeMap(response => {
+          this.totalpages = (<any>response).total_pages;
           let i = 2;
-          const temp = [Observable.of(response)];
+          const temp = [observableOf(response)];
           while (i <= this.totalpages) {
             const queryAux = JSON.parse(JSON.stringify(query));
             queryAux.page = i;
             temp.push(this.find(queryAux));
             i = i + 1;
           }
-          return Observable.merge(temp).mergeAll(5).toArray();
-        })
-        .map(res => res as any)
-        .map((results) => {
+          return observableMerge(temp).pipe(mergeAll(5), toArray());
+        }),
+        map(res => res as any),
+        map((results) => {
           let result = [];
           const fetched_results = {};
-          results.forEach(array => {
+          (<any>results).forEach(array => {
             const v = array as any;
             result = result.concat(v.results);
             if (v.fetched_results) {
@@ -639,7 +635,7 @@ export class AngularFind extends Find {
             }
           });
           return {success: true, results: result, fetched_results: fetched_results};
-        });
+        }));
     }else {
       return this.thenRx();
     }
