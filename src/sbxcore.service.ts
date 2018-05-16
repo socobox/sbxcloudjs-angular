@@ -573,18 +573,18 @@ export class AngularFind extends Find {
 
   public thenRx(toFetch = []): Observable<any> {
     const option = {headers: this.core.getHeadersJSON() };
-    return this.core.httpClient.post(this.url, this.query.compile(), option).map(res => {
+    return this.core.httpClient.post(this.url, this.query.compile(), option).pipe(map(res => {
       if (toFetch.length && this.isFind) {
         return this.mapFetchesResult(res, toFetch);
       }
       return res;
-    }).map(res => res as any);
+    }), map(res => res as any));
   }
 
   private find(query?: any) {
     const option = {headers: this.core.getHeadersJSON() };
     return this.core.httpClient.post(this.core.$p(this.core.urls.find),
-      (query == null) ? this.query.compile() : query, option).map(res => res as any);
+      (query == null) ? this.query.compile() : query, option).pipe(map(res => res as any));
   }
 
   public loadAll () {
