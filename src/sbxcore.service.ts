@@ -563,7 +563,7 @@ export class AngularFind extends Find {
    * @param {Array} toFetch Optional params to auto map fetches result.
    */
 
-  public then(toFetch = []) {
+  public toPromise(toFetch = []) {
     return this.thenRx(toFetch).toPromise();
   }
 
@@ -608,7 +608,7 @@ export class AngularFind extends Find {
           return observableMerge(temp).pipe(mergeAll(5), toArray());
         }),
         map(res => res as any),
-        map((results) => {
+        map(results => {
           let result = [];
           const fetched_results = {};
           (<any>results).forEach(array => {

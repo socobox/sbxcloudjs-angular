@@ -1,9 +1,9 @@
 {
   "name": "sbx",
-  "version": "3.0.0-beta",
-  "description": "Sbx Core for Angular4",
+  "version": "3.0.1-beta",
+  "description": "Sbx Core for Angular",
   "keywords": [
-    "angular 4",
+    "angular",
     "sbx"
   ],
   "main": "index.js",

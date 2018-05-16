@@ -1,9 +1,9 @@
 {
     "name": "sbxangular",
-    "version": "3.0.0-beta",
-    "description": "Sbx Core for Angular4",
+    "version": "3.0.1-beta",
+    "description": "Sbx Core for Angular",
     "keywords": [
-        "angular 4",
+        "angular",
         "sbx"
     ],
     "main": "bundles/sbx.umd.min.js",
@@ -19,19 +19,18 @@
     "url": "https://github.com/sbxcloud/angular4library.git"
   },
     "peerDependencies": {
-      "@angular/common": "^4.2.4",
-      "@angular/platform-browser": "^4.0.1",
-      "@angular/platform-browser-dynamic": "^4.0.1",
-      "@angular/compiler": "^4.2.4",
-      "@angular/core": "^4.2.4",
-      "@angular/forms": "^4.2.4",
-      "@angular/http": "^4.2.4",
-      "core-js": "^2.4.1",
+      "@angular/common": "^6.0.0",
+      "@angular/compiler": "^6.0.0",
+      "@angular/core": "^6.0.0",
+      "@angular/forms": "^6.0.0",
+      "@angular/http": "^6.0.0",
+      "@angular/platform-browser": "^6.0.0",
+      "@angular/platform-browser-dynamic": "^6.0.0",
+      "core-js": "^2.5.5",
       "ngx-cookie-service": "^1.0.7",
       "rxjs": "^6.1.0",
-      "rxjs-compat": "^6.1.0",
       "sbx-querybuilder": "^1.0.8",
       "sbxcorejs": "^1.0.2",
-      "zone.js": "^0.8.14"
+      "zone.js": "^0.8.26"
     }
 }

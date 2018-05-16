@@ -12,11 +12,12 @@ const globals = {
 };
 
 export default {
-	entry: 'dist/index.js',
-	dest: 'dist/bundles/sbx.umd.js',
-	sourceMap: false,
-	format: 'umd',
-	moduleName: 'sbxangular',
-	globals: globals,
+	input: 'dist/src/index.js',
+	output: {
+	  file: 'dist/bundles/sbx.umd.js',
+    format: 'umd',
+    globals: globals,
+    name: 'sbxangular'
+  },
   external: Object.keys(globals)
 }
