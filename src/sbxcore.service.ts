@@ -277,7 +277,7 @@ export class SbxCoreService {
     const option = {headers: this.getHeadersJSON() };
     return this.httpClient.post(this.$p(this.urls.update), body, option).pipe(map(res => res as any));
   }
-  
+
   /**
    * @param {string} model the name model in sbxcloud
    */
@@ -546,7 +546,7 @@ export class AngularFind extends Find {
     this.core = core;
     this.totalpages = 1;
   }
-  
+
   public delete() {
     return this.deleteRx().toPromise();
   }
@@ -555,15 +555,15 @@ export class AngularFind extends Find {
     this.setUrl(false);
     return this.thenRx();
   }
-  
+
     /**
    * @param {Array} toFetch Optional params to auto map fetches result.
    */
-  
+
   public find(toFetch = []) {
     return this.findRx(toFetch).toPromise();
   }
-  
+
     /**
    * @param {Array} toFetch Optional params to auto map fetches result.
    */
@@ -572,7 +572,7 @@ export class AngularFind extends Find {
     this.setUrl(true);
     return this.thenRx(toFetch);
   }
-  
+
     /**
    * @param {Array} toFetch Optional params to auto map fetches result.
    */
@@ -580,7 +580,7 @@ export class AngularFind extends Find {
   public loadAll (toFetch = []) {
     return this.loadAllRx(toFetch).toPromise();
   }
-  
+
     /**
    * @param {Array} toFetch Optional params to auto map fetches result.
    */
@@ -634,12 +634,21 @@ export class AngularFind extends Find {
       return this.thenRx();
     }
   }
-  
+
+  /**
+   * Change the url, to find or to delete
+   * @param isFind if true, the url is gotten from urls.find else urls.delete
+   */
   private setUrl(isFind) {
     this.isFind = isFind;
     this.url = isFind ? this.core.$p(this.core.urls.find) : this.core.$p(this.core.urls.delete);
   }
 
+  /**
+   * get the data
+   * @param {any[]} toFetch Optional params to auto map fetches result.
+   * @return {Observable<any>}
+   */
   private thenRx(toFetch = []): Observable<any> {
     const option = {headers: this.core.getHeadersJSON() };
     return this.core.httpClient.post(this.url, this.query.compile(), option).pipe(map(res => {
@@ -650,6 +659,11 @@ export class AngularFind extends Find {
     }), map(res => res as any));
   }
 
+  /**
+   * Is used to paginate load all
+   * @param query
+   * @return {Observable<any>}
+   */
   private findPage(query?: any) {
     const option = {headers: this.core.getHeadersJSON() };
     return this.core.httpClient.post(this.core.$p(this.core.urls.find),
