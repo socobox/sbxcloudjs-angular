@@ -637,7 +637,7 @@ export class AngularFind extends Find {
   
   private setUrl(isFind) {
     this.isFind = isFind;
-    this.url = isFind ? this.core.$p(core.urls.find) : this.core.$p(core.urls.delete);
+    this.url = isFind ? this.core.$p(this.core.urls.find) : this.core.$p(this.core.urls.delete);
   }
 
   private thenRx(toFetch = []): Observable<any> {
