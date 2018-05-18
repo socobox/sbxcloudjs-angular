@@ -277,23 +277,13 @@ export class SbxCoreService {
     const option = {headers: this.getHeadersJSON() };
     return this.httpClient.post(this.$p(this.urls.update), body, option).pipe(map(res => res as any));
   }
-  /**
-   * @param {string} model the name model in sbxcloud
-   * @param keys can be a string, a Class or array of both
-   * @param {Callback} callBack
-   */
-  delete(model: string) {
-    return new AngularFind(model, this, false);
-  }
 
   /**
    * @param {string} model the name model in sbxcloud
-   * @param keys can be a string, a Class or array of both
    */
-  find(model: string) {
-    return new AngularFind(model, this, true);
+  with(model: string) {
+    return new AngularFind(model, this);
   }
-
 
   /**
    * @param {EmailData} data
@@ -487,7 +477,7 @@ export class SbxCoreService {
   }
 
   /**
-   * @deprecated Now you can parameterize the 'then' function with a fetch array
+   * @deprecated Now you can parameterize the 'find' function with a fetch array
    * @param response the response of the server
    * @param {string[]} completefetch the array of fetch
    * @returns {any} the response with the union between fetch_results and results
@@ -551,45 +541,49 @@ export class AngularFind extends Find {
   private totalpages;
   private isFind;
 
-  constructor(model: string, core: SbxCoreService, isFind: boolean) {
+  constructor(model: string, core: SbxCoreService) {
     super(model, SbxCoreService.environment.domain);
     this.core = core;
-    this.isFind = isFind;
     this.totalpages = 1;
-    this.url = isFind ? core.$p(core.urls.find) : core.$p(core.urls.delete);
   }
 
-  /**
+  public delete() {
+    return this.deleteRx().toPromise();
+  }
+
+  public deleteRx(): Observable<any> {
+    this.setUrl(false);
+    return this.thenRx();
+  }
+
+    /**
    * @param {Array} toFetch Optional params to auto map fetches result.
    */
 
-  public toPromise(toFetch = []) {
-    return this.thenRx(toFetch).toPromise();
+  public find(toFetch = []) {
+    return this.findRx(toFetch).toPromise();
   }
 
-  /**
+    /**
    * @param {Array} toFetch Optional params to auto map fetches result.
    */
 
-  public thenRx(toFetch = []): Observable<any> {
-    const option = {headers: this.core.getHeadersJSON() };
-    return this.core.httpClient.post(this.url, this.query.compile(), option).pipe(map(res => {
-      if (toFetch.length && this.isFind) {
-        return this.mapFetchesResult(res, toFetch);
-      }
-      return res;
-    }), map(res => res as any));
+  public findRx(toFetch = []): Observable<any> {
+    this.setUrl(true);
+    return this.thenRx(toFetch);
   }
 
-  private find(query?: any) {
-    const option = {headers: this.core.getHeadersJSON() };
-    return this.core.httpClient.post(this.core.$p(this.core.urls.find),
-      (query == null) ? this.query.compile() : query, option).pipe(map(res => res as any));
+    /**
+   * @param {Array} toFetch Optional params to auto map fetches result.
+   */
+
+  public loadAll (toFetch = []) {
+    return this.loadAllRx(toFetch).toPromise();
   }
 
-  public loadAll () {
-    return this.loadAllRx().toPromise();
-  }
+    /**
+   * @param {Array} toFetch Optional params to auto map fetches result.
+   */
 
   public loadAllRx (toFetch = []) {
     if (this.isFind) {
@@ -602,7 +596,7 @@ export class AngularFind extends Find {
           while (i <= this.totalpages) {
             const queryAux = JSON.parse(JSON.stringify(query));
             queryAux.page = i;
-            temp.push(this.find(queryAux));
+            temp.push(this.findPage(queryAux));
             i = i + 1;
           }
           return observableMerge(temp).pipe(mergeAll(5), toArray());
@@ -639,6 +633,41 @@ export class AngularFind extends Find {
     }else {
       return this.thenRx();
     }
+  }
+
+  /**
+   * Change the url, to find or to delete
+   * @param isFind if true, the url is gotten from urls.find else urls.delete
+   */
+  private setUrl(isFind) {
+    this.isFind = isFind;
+    this.url = isFind ? this.core.$p(this.core.urls.find) : this.core.$p(this.core.urls.delete);
+  }
+
+  /**
+   * get the data
+   * @param {any[]} toFetch Optional params to auto map fetches result.
+   * @return {Observable<any>}
+   */
+  private thenRx(toFetch = []): Observable<any> {
+    const option = {headers: this.core.getHeadersJSON() };
+    return this.core.httpClient.post(this.url, this.query.compile(), option).pipe(map(res => {
+      if (toFetch.length && this.isFind) {
+        return this.mapFetchesResult(res, toFetch);
+      }
+      return res;
+    }), map(res => res as any));
+  }
+
+  /**
+   * Is used to paginate load all
+   * @param query
+   * @return {Observable<any>}
+   */
+  private findPage(query?: any) {
+    const option = {headers: this.core.getHeadersJSON() };
+    return this.core.httpClient.post(this.core.$p(this.core.urls.find),
+      (query == null) ? this.query.compile() : query, option).pipe(map(res => res as any));
   }
 }
 
