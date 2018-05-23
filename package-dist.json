@@ -11,8 +11,14 @@
     "typings": "index.d.ts",
     "author": {
         "name": "Luis Guzman",
-        "email": "lucho@socobox.co"
+        "email": "lgguzman890414@gmail.com"
     },
+    "contributors": [
+      {
+        "name": "Alexander Taborda Acosta",
+        "email": "alextab93@gmail.com"
+      }
+    ],
       "license": "ISC",
   "repository": {
     "type": "git",
@@ -29,7 +35,6 @@
       "core-js": "^2.5.5",
       "ngx-cookie-service": "^1.0.7",
       "rxjs": "^6.1.0",
-      "sbx-querybuilder": "^1.0.8",
       "sbxcorejs": "^1.0.2",
       "zone.js": "^0.8.26"
     }
