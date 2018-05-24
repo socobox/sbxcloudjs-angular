@@ -596,6 +596,7 @@ export class AngularFind extends Find {
   }
 
   public loadAllRx (toFetch = []) {
+    if (this.isFind) {
       this.setPageSize(100);
       const query = this.query.compile();
       return this.thenRx().mergeMap(response => {
@@ -639,6 +640,9 @@ export class AngularFind extends Find {
           });
           return {success: true, results: result, fetched_results: fetched_results};
         });
+    }else {
+      return this.thenRx();
+    }
   }
 }
 

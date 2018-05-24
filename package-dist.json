@@ -1,7 +1,7 @@
 {
     "name": "sbxangular",
-    "version": "2.0.7",
-    "description": "Sbx Core for Angular4 +",
+    "version": "2.0.6",
+    "description": "Sbx Core for Angular4",
     "keywords": [
         "angular 4",
         "sbx"
@@ -11,7 +11,7 @@
     "typings": "index.d.ts",
     "author": {
         "name": "Luis Guzman",
-        "email": "lgguzman890414@gmail.com"
+        "email": "lucho@socobox.co"
     },
       "license": "ISC",
   "repository": {
