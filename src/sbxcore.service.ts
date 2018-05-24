@@ -14,7 +14,7 @@ export class SbxCoreService extends SbxCore {
   private headers: any;
 
 
-  constructor(private httpClient: HttpClient) {
+  constructor(public httpClient: HttpClient) {
     super();
   }
 
@@ -36,7 +36,7 @@ export class SbxCoreService extends SbxCore {
     return  this.headers;
   }
 
-  private getHeadersJSON(): any {
+  public getHeadersJSON(): any {
     return this.getHeaders().append('Content-Type', 'application/json');
   }
 
@@ -391,10 +391,21 @@ export class SbxResponse<T> {
   public results?: Array<T>;
   public fetched_results?: any;
   public total_pages: number;
+
+  public isAny(): boolean {
+    return this.results === undefined
+      || this.results === null
+      || this.results.length === 0
+      || this.results[0].constructor.name === 'Object';
+  }
+
+  public toAny(): any {
+    return this as any;
+  }
 }
 
 export class AngularFind extends Find {
-  private core;
+  private core: SbxCoreService;
   private url;
   private totalpages;
   private isFind;
@@ -414,37 +425,26 @@ export class AngularFind extends Find {
     return this.thenRx();
   }
 
-    /**
-   * @param {Array} toFetch Optional params to auto map fetches result.
+  public find(toFetch: string[]);
+  public find<T>();
+
+
+  /**
+  * @param {Array} toFetch Optional params to auto map fetches result.
+  * match T object, no return fetched_results
    */
-
-  public find(toFetch = []) {
-    return this.findRx(toFetch).toPromise();
-  }
-
-    /**
-   * @param {Array} toFetch Optional params to auto map fetches result.
-   */
-
-  public findRx(toFetch = []): Observable<any> {
-    this.setUrl(true);
-    return this.thenRx(toFetch);
-  }
-
-  /*
-  *match T object, no return fetched_results
-   */
-  public find<T>(): Promise<Array<T>> {
-    return this.findRx<T>().toPromise<Array<T>>();
+  public find<T>(toFetch = []): Promise<Array<T> | any> {
+    return this.findRx<T>(toFetch).toPromise();
   }
 
   /**
-   *match T object, no return fetched_results
+   * @param {Array} toFetch Optional params to auto map fetches result.
+   * match T object, no return fetched_results
    */
 
-  public findRx<T>(): Observable<Array<T>> {
+  public findRx<T>(toFetch = []): Observable<Array<T> | any> {
     this.setUrl(true);
-    return this.thenRx<T>();
+    return this.thenRx<T>(toFetch);
   }
 
     /**
@@ -462,7 +462,7 @@ export class AngularFind extends Find {
   public loadAllRx (toFetch = []) {
       this.setPageSize(100);
       const query = this.query.compile();
-      return this.thenRx().pipe(mergeMap(response => {
+      return this.thenRx().pipe(mergeMap<any, any>(response => {
           this.totalpages = (<any>response).total_pages;
           let i = 2;
           const temp = [observableOf(response)];
@@ -506,36 +506,6 @@ export class AngularFind extends Find {
   }
 
   /**
-   * match T object, no return fetched_results
-   */
-
-  public loadAll<T> (): Promise<Array<T>> {
-    return this.loadAllRx<T>().toPromise<Array<T>>();
-  }
-
-  /**
-   * match T object, no return fetched_results
-   */
-
-  public loadAllRx<T> (): Observable<Array<T>> {
-    this.setPageSize(100);
-    const query = this.query.compile();
-    return this.thenRx<T>().pipe(mergeMap(response => {
-        this.totalpages = response.total_pages;
-        let i = 2;
-        const temp = [observableOf(response)];
-        while (i <= this.totalpages) {
-          const queryAux = JSON.parse(JSON.stringify(query));
-          queryAux.page = i;
-          temp.push(this.findPage<T>(queryAux));
-          i = i + 1;
-        }
-        return observableMerge(temp).pipe(mergeAll(5), toArray<Array<T>>());
-      }),
-    );
-  }
-
-  /**
    * Change the url, to find or to delete
    * @param isFind if true, the url is gotten from urls.find else urls.delete
    */
@@ -543,31 +513,30 @@ export class AngularFind extends Find {
     this.url = isFind ? this.core.$p(this.core.urls.find) : this.core.$p(this.core.urls.delete);
   }
 
+
   /**
    * get the data
    * @param {any[]} toFetch Optional params to auto map fetches result.
    * @return {Observable<any>}
    */
-  private thenRx(toFetch = []): Observable<any> {
-    const option = {headers: this.core.getHeadersJSON() };
-    return this.core.httpClient.post(this.url, this.query.compile(), option).pipe(map(res => {
-      if (toFetch.length && this.isFind) {
-        return this.mapFetchesResult(res, toFetch);
-      }
-      return res;
-    }), map(res => res as any));
-  }
-
-  private thenRx<T>(): Observable<Array<T>> {
+  private thenRx<T>(toFetch = []):  Observable<any | Array<T>>  {
     const option = {headers: this.core.getHeadersJSON() };
     return this.core.httpClient.post<SbxResponse<T>>(this.url, this.query.compile(), option).pipe(
-      map(function (res) {
-        if (!res.success) {
-          throw new Error(res.message);
-        } else {
-          return res.results;
+      map<SbxResponse<T>, SbxResponse<T> | any>(res => {
+        if (res.isAny()) {
+          const newRest = res.toAny();
+          if (toFetch.length && this.isFind) {
+            return this.mapFetchesResult(newRest, toFetch);
+          }
+          return newRest;
+        }else {
+          if (!res.success) {
+            throw new Error(res.message);
+          } else {
+            return res.results;
+          }
         }
-      })
+    })
     );
   }
 
@@ -582,24 +551,6 @@ export class AngularFind extends Find {
       (query == null) ? this.query.compile() : query, option).pipe(map(res => res as any));
   }
 
-  /**
-   * Is used to paginate load all
-   * @param query
-   * @return {Observable<any>}
-   */
-  private findPage<T>(query?: any): Observable<Array<T>> {
-    const option = {headers: this.core.getHeadersJSON() };
-    return this.core.httpClient.post<SbxResponse<T>>(this.core.$p(this.core.urls.find),
-      (query == null) ? this.query.compile() : query, option).pipe(
-      map(function (res) {
-        if (!res.success) {
-          throw new Error(res.message);
-        } else {
-          return res.results;
-        }
-      })
-    );
-  }
 }
 
 export interface EmailData {
