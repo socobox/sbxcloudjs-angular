@@ -1,12 +1,9 @@
+
+import {map} from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import {SbxCoreService} from '../sbxcore.service';
 import {CookieService} from 'ngx-cookie-service';
-import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/mergeMap';
-import 'rxjs/add/operator/toPromise';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/observable/forkJoin';
+import {Observable} from 'rxjs';
 
 @Injectable()
 export class SbxSessionService {
@@ -83,13 +80,13 @@ export class SbxSessionService {
   }
 
   loginRx(login: string, password: string, domain?: number) {
-    return this.sbxCoreService.loginRx(login, password, domain)
-      .map(data => {
-        if (data.success) {
+    return this.sbxCoreService.loginRx(login, password, domain).pipe(
+      map(data => {
+        if ((<any>data).success) {
           this.updateUser(data);
         }
           return data;
-      });
+      }));
   }
 
   validate(token: string) {
@@ -97,14 +94,14 @@ export class SbxSessionService {
   }
 
   validateRx(token: string ) {
-    return this.sbxCoreService.validateRx(token)
-      .map(data => {
-        if (data.success) {
-          data.token = token;
+    return this.sbxCoreService.validateRx(token).pipe(
+      map(data => {
+        if ((<any>data).success) {
+          (<any>data).token = token;
           this.updateUser(data);
         }
         return data;
-      });
+      }));
   }
 
   logout(): void {
@@ -118,13 +115,13 @@ export class SbxSessionService {
   }
 
   signUpRx(login: string, email: string, name: string, password: string) {
-    return this.sbxCoreService.signUpRx(login, email, name, password)
-      .map(data => {
-        if (data.success) {
+    return this.sbxCoreService.signUpRx(login, email, name, password).pipe(
+      map(data => {
+        if ((<any>data).success) {
           this.updateUser(data);
         }
           return data;
-      });
+      }));
   }
 
 }

@@ -1,9 +1,9 @@
 {
   "name": "sbx",
-  "version": "2.0.6",
-  "description": "Sbx Core for Angular4",
+  "version": "3.0.3-beta",
+  "description": "Sbx Core for Angular",
   "keywords": [
-    "angular 4",
+    "angular",
     "sbx"
   ],
   "main": "index.js",
@@ -31,8 +31,10 @@
     "url": "https://github.com/sbxcloud/angular4library.git"
   },
   "devDependencies": {
-    "@angular/compiler-cli": "^4.2.4",
-    "@angular/language-service": "^4.2.4",
+    "@angular/cli": "6.0.3",
+    "@angular/compiler-cli": "^6.0.0",
+    "@angular/language-service": "^6.0.0",
+    "@types/node": "~6.0.60",
     "renamer": "^0.6.1",
     "rimraf": "^2.5.4",
     "rollup": "^0.58.2",
@@ -41,21 +43,21 @@
     "typescript": "~2.7.2",
     "uglify-js": "3.3.23",
     "cpx": "^1.5.0",
+    "codelyzer": "^4.3.0",
     "webpack-bundle-analyzer": "^2.12.0"
   },
   "dependencies": {
-    "@angular/common": "^4.2.4",
-    "@angular/compiler": "^4.2.4",
-    "@angular/core": "^4.2.4",
-    "@angular/forms": "^4.2.4",
-    "@angular/http": "^4.2.4",
-    "@angular/platform-browser": "^4.0.1",
-    "@angular/platform-browser-dynamic": "^4.0.1",
-    "core-js": "^2.4.1",
+    "@angular/common": "^6.0.0",
+    "@angular/compiler": "^6.0.0",
+    "@angular/core": "^6.0.0",
+    "@angular/forms": "^6.0.0",
+    "@angular/http": "^6.0.0",
+    "@angular/platform-browser": "^6.0.0",
+    "@angular/platform-browser-dynamic": "^6.0.0",
+    "core-js": "^2.5.5",
     "ngx-cookie-service": "^1.0.7",
-    "rxjs": "^5.4.2",
-    "sbx-querybuilder": "^1.0.8",
-    "sbxcorejs": "^1.0.2",
-    "zone.js": "^0.8.14"
+    "rxjs": "^6.1.0",
+    "sbxcorejs": "^1.1.1",
+    "zone.js": "^0.8.26"
   }
 }
