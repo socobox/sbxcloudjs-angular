@@ -3,46 +3,25 @@ import {merge as observableMerge, of as observableOf,  Observable } from 'rxjs';
 import {toArray, mergeAll, map, mergeMap} from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
-import QueryBuilder from 'sbx-querybuilder/index';
-import { Find } from 'sbxcorejs';
+import { Find, SbxCore } from 'sbxcorejs';
 
 
 
 @Injectable()
-export class SbxCoreService {
+export class SbxCoreService extends SbxCore {
 
-  public static environment = { } as any;
+
   private headers: any;
 
-  public urls: any = {
-    update_password: '/user/v1/password',
-    login: '/user/v1/login',
-    register: '/user/v1/register',
-    validate: '/user/v1/validate',
-    row: '/data/v1/row',
-    find: '/data/v1/row/find',
-    update: '/data/v1/row/update',
-    delete: '/data/v1/row/delete',
-    downloadFile: '/content/v1/download',
-    uploadFile: '/content/v1/upload',
-    addFolder: '/content/v1/folder',
-    folderList: '/content/v1/folder',
-    send_mail: '/email/v1/send',
-    payment_customer: '/payment/v1/customer',
-    payment_card: '/payment/v1/card',
-    payment_token: '/payment/v1/token',
-    password: '/user/v1/password/request',
-    cloudscript_run: '/cloudscript/v1/run'
-  };
 
-  constructor(private httpClient: HttpClient) { }
+  constructor(public httpClient: HttpClient) {
+    super();
+  }
 
   public initialize(domain: number, appKey: string, baseUrl: string = 'https://sbxcloud.com/api') {
-    SbxCoreService.environment.domain = domain;
-    SbxCoreService.environment.baseUrl = baseUrl;
-    SbxCoreService.environment.appKey = appKey;
+    super.initialize(domain, appKey, baseUrl);
     this.headers = new HttpHeaders()
-      .set('App-Key', SbxCoreService.environment.appKey);
+      .set('App-Key', appKey);
   }
 
   public addHeaderAttr(name: string, value: string): void {
@@ -57,12 +36,12 @@ export class SbxCoreService {
     return  this.headers;
   }
 
-  private getHeadersJSON(): any {
+  public getHeadersJSON(): any {
     return this.getHeaders().append('Content-Type', 'application/json');
   }
 
   $p(path: string) {
-    return SbxCoreService.environment.baseUrl + path;
+    return SbxCore.environment.baseUrl + path;
   }
 
   /**
@@ -86,23 +65,6 @@ export class SbxCoreService {
     return this.httpClient.get(this.$p(this.urls.validate), option).pipe(map(data => data as any)) ;
   }
 
-  private encodeEmails(email: string) {
-    const spl = email.split('@');
-    if (spl.length > 1) {
-      email = encodeURIComponent(spl[0]) + '@' + spl[1];
-    }
-    return email;
-  }
-
-  private validateLogin(login: string): boolean {
-    const rlogin   =  /^(\w?\.?\-?)+$/;
-    return rlogin.test(login);
-  }
-
-  private validateEmail(email: string): boolean {
-    const rlogin  =  /^(\w?\.?\-?\+?)+@(\w?\.?\-?)+$/;
-    return rlogin.test(email);
-  }
 
   /**
    *
@@ -126,7 +88,7 @@ export class SbxCoreService {
     if (this.validateLogin(login) && this.validateEmail(email)) {
       const option = {headers: this.getHeadersJSON()};
       const params = '?email=' + this.encodeEmails(email) + '&password=' +  encodeURIComponent(password) + '&name='
-        + name + '&login=' + login + '&domain=' + SbxCoreService.environment.domain.toLocaleString();
+        + name + '&login=' + login + '&domain=' + SbxCore.environment.domain.toLocaleString();
       return this.httpClient.get(this.$p(this.urls.register) + params, option).pipe(map(data => data as any));
     } else {
       return observableOf({success: false,
@@ -182,7 +144,7 @@ export class SbxCoreService {
    */
   sendPasswordRequestRx(userEmail: string, subject: string, emailTemplate: string): Observable<any> {
     const body =  {user_email: userEmail,
-      domain: SbxCoreService.environment.domain, subject: subject, email_template: emailTemplate};
+      domain: SbxCore.environment.domain, subject: subject, email_template: emailTemplate};
     const option = {headers: this.getHeadersJSON() };
     return this.httpClient.post(this.$p(this.urls.password), body, option).pipe(map( data => data as any));
   }
@@ -205,7 +167,7 @@ export class SbxCoreService {
    * @return {Observable<Object>}
    */
   requestChangePasswordRx(userId, userCode, newPassword) {
-    const body = {domain: SbxCoreService.environment.domain,
+    const body = {domain: SbxCore.environment.domain,
       password: newPassword,
       user_id: userId,
       code: userCode};
@@ -227,7 +189,7 @@ export class SbxCoreService {
    * @return {Observable<Object>}
    */
   changePasswordRx(newPassword) {
-    const httpParams = new HttpParams().set('domain', SbxCoreService.environment.domain).set('password', newPassword);
+    const httpParams = new HttpParams().set('domain', SbxCore.environment.domain).set('password', newPassword);
     const option = { headers: this.getHeadersJSON(), params: httpParams };
     return this.httpClient.get(this.$p(this.urls.update_password), option).pipe(map(data => data));
   }
@@ -300,7 +262,7 @@ export class SbxCoreService {
     const mail = {
       subject: data.subject,
       to: data.to,
-      domain: SbxCoreService.environment.domain,
+      domain: SbxCore.environment.domain,
       from: data.from,
     } as any;
     if (data.template) {
@@ -334,7 +296,7 @@ export class SbxCoreService {
    * @return {Observable<any>}
    */
   paymentCustomerRx(data: Object): Observable<any> {
-    data['domain'] = SbxCoreService.environment.domain;
+    data['domain'] = SbxCore.environment.domain;
     const option = {headers: this.getHeadersJSON() };
     return this.httpClient.post(this.$p(this.urls.payment_customer), data, option).pipe(map(res => res as any));
   }
@@ -351,7 +313,7 @@ export class SbxCoreService {
    * @return {Observable<any>}
    */
   paymentCardRx(data: Object): Observable<any> {
-    data['domain'] = SbxCoreService.environment.domain;
+    data['domain'] = SbxCore.environment.domain;
     const option = {headers: this.getHeadersJSON() };
     return this.httpClient.post(this.$p(this.urls.payment_card), data, option).pipe(map(res => res as any));
   }
@@ -421,128 +383,35 @@ export class SbxCoreService {
     return this.runRx(key, params).toPromise();
   }
 
-  /**
-   * UTILS
-   */
+}
 
-  private queryBuilderToInsert(data, letNull?: Boolean): any {
-    const query =   new QueryBuilder()
-      .setDomain(SbxCoreService.environment.domain);
-    if (Array.isArray(data) ) {
-      data.forEach(item => {
-        query.addObject(this.validateData(item, letNull));
-      });
-    }else {
-      query.addObject(this.validateData(data, letNull));
-    }
-    return query;
+export class SbxResponse<T> {
+  public success: boolean;
+  public message?: string;
+  public results?: Array<T>;
+  public fetched_results?: any;
+  public total_pages: number;
+
+  public isAny(): boolean {
+    return this.results === undefined
+      || this.results === null
+      || this.results.length === 0
+      || this.results[0].constructor.name === 'Object';
   }
 
-  public validateData(data: any, letNull?: Boolean): any {
-    const temp = {};
-    Object.keys(data)
-      .filter(key => {
-        const v = data[key];
-        return (((Array.isArray(v) || typeof v === 'string') ?
-          (v.length > 0) :
-          (v !== null && v !== undefined)) || letNull);
-      }).forEach(key => {
-      if ( (data[key] !== null && data[key] !== undefined)  && data[key]._KEY != null) {
-        data[key] = data[key]._KEY;
-      }
-      const key2 = (key !== '_KEY') ? key.replace(/^_/, '') : key;
-      temp[key2] = data[key];
-    });
-    return temp;
+  public toAny(): any {
+    return this as any;
   }
-
-  public validateKeys(data: any): any {
-    const temp = [];
-    if (Array.isArray(data) ) {
-      data.forEach(key => {
-        if (typeof key === 'string') {
-          temp.push(key);
-        }else {
-          temp.push(key._KEY);
-        }
-      });
-    }else {
-      if (typeof data === 'string') {
-        temp.push(data);
-      }else {
-        temp.push(data._KEY);
-      }
-    }
-    return temp;
-  }
-
-  /**
-   * @deprecated Now you can parameterize the 'find' function with a fetch array
-   * @param response the response of the server
-   * @param {string[]} completefetch the array of fetch
-   * @returns {any} the response with the union between fetch_results and results
-   */
-  public mapFetchesResult(response: any, completefetch: string[] ) {
-
-    if (response.fetched_results) {
-      const fetch = [];
-      const secondfetch = {};
-      for (let i = 0; i < completefetch.length; i++) {
-        let index = 0;
-        const temp = completefetch[i].split('.');
-        if (fetch.indexOf(temp[0]) < 0) {
-          fetch.push(temp[0]);
-          index = fetch.length - 1;
-        } else {
-          index = fetch.indexOf(temp[0]);
-        }
-        if (temp.length === 2 && !secondfetch[fetch[index]]) {
-          secondfetch[fetch[index]] = [];
-        }
-
-        if (temp.length === 2) {
-          secondfetch[fetch[index]].push(temp[1]);
-        }
-      }
-      for (let i = 0; i < response.results.length; i++) {
-        for (let j = 0; j < fetch.length; j++) {
-          for (const mod in response.fetched_results) {
-            if (response.fetched_results[mod][response.results[i][fetch[j]]]) {
-              response.results[i][fetch[j]] = response.fetched_results[mod][response.results[i][fetch[j]]];
-              if (secondfetch[fetch[j]]) {
-                for (let k = 0; k < secondfetch[fetch[j]].length; k++) {
-                  const second = secondfetch[fetch[j]][k];
-                  for (const mod2 in response.fetched_results) {
-                    if (response.fetched_results[mod2][response.results[i][fetch[j]][second]]) {
-                      response.results[i][fetch[j]][second] =
-                        response.fetched_results[mod2][response.results[i][fetch[j]][second]];
-                      break;
-                    }
-                  }
-                }
-              }
-
-              break;
-            }
-          }
-        }
-
-      }
-    }
-
-    return response;
-  }
-
 }
 
 export class AngularFind extends Find {
-  private core;
+  private core: SbxCoreService;
   private url;
   private totalpages;
   private isFind;
 
   constructor(model: string, core: SbxCoreService) {
-    super(model, SbxCoreService.environment.domain);
+    super(model, SbxCore.environment.domain);
     this.core = core;
     this.totalpages = 1;
   }
@@ -556,21 +425,26 @@ export class AngularFind extends Find {
     return this.thenRx();
   }
 
-    /**
-   * @param {Array} toFetch Optional params to auto map fetches result.
-   */
+  public find(toFetch: string[]);
+  public find<T>();
 
-  public find(toFetch = []) {
-    return this.findRx(toFetch).toPromise();
+
+  /**
+  * @param {Array} toFetch Optional params to auto map fetches result.
+  * match T object, no return fetched_results
+   */
+  public find<T>(toFetch = []): Promise<Array<T> | any> {
+    return this.findRx<T>(toFetch).toPromise();
   }
 
-    /**
+  /**
    * @param {Array} toFetch Optional params to auto map fetches result.
+   * match T object, no return fetched_results
    */
 
-  public findRx(toFetch = []): Observable<any> {
+  public findRx<T>(toFetch = []): Observable<Array<T> | any> {
     this.setUrl(true);
-    return this.thenRx(toFetch);
+    return this.thenRx<T>(toFetch);
   }
 
     /**
@@ -586,10 +460,9 @@ export class AngularFind extends Find {
    */
 
   public loadAllRx (toFetch = []) {
-    if (this.isFind) {
       this.setPageSize(100);
       const query = this.query.compile();
-      return this.thenRx().pipe(mergeMap(response => {
+      return this.thenRx().pipe(mergeMap<any, any>(response => {
           this.totalpages = (<any>response).total_pages;
           let i = 2;
           const temp = [observableOf(response)];
@@ -630,9 +503,6 @@ export class AngularFind extends Find {
           });
           return {success: true, results: result, fetched_results: fetched_results};
         }));
-    }else {
-      return this.thenRx();
-    }
   }
 
   /**
@@ -640,23 +510,34 @@ export class AngularFind extends Find {
    * @param isFind if true, the url is gotten from urls.find else urls.delete
    */
   private setUrl(isFind) {
-    this.isFind = isFind;
     this.url = isFind ? this.core.$p(this.core.urls.find) : this.core.$p(this.core.urls.delete);
   }
+
 
   /**
    * get the data
    * @param {any[]} toFetch Optional params to auto map fetches result.
    * @return {Observable<any>}
    */
-  private thenRx(toFetch = []): Observable<any> {
+  private thenRx<T>(toFetch = []):  Observable<any | Array<T>>  {
     const option = {headers: this.core.getHeadersJSON() };
-    return this.core.httpClient.post(this.url, this.query.compile(), option).pipe(map(res => {
-      if (toFetch.length && this.isFind) {
-        return this.mapFetchesResult(res, toFetch);
-      }
-      return res;
-    }), map(res => res as any));
+    return this.core.httpClient.post<SbxResponse<T>>(this.url, this.query.compile(), option).pipe(
+      map<SbxResponse<T>, SbxResponse<T> | any>(res => {
+        if (res.isAny()) {
+          const newRest = res.toAny();
+          if (toFetch.length && this.isFind) {
+            return this.mapFetchesResult(newRest, toFetch);
+          }
+          return newRest;
+        }else {
+          if (!res.success) {
+            throw new Error(res.message);
+          } else {
+            return res.results;
+          }
+        }
+    })
+    );
   }
 
   /**
@@ -669,6 +550,7 @@ export class AngularFind extends Find {
     return this.core.httpClient.post(this.core.$p(this.core.urls.find),
       (query == null) ? this.query.compile() : query, option).pipe(map(res => res as any));
   }
+
 }
 
 export interface EmailData {
