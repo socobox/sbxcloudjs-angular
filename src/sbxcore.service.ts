@@ -1,4 +1,3 @@
-
 import {merge as observableMerge, of as observableOf,  Observable } from 'rxjs';
 import {toArray, mergeAll, map, mergeMap} from 'rxjs/operators';
 import { Injectable } from '@angular/core';
