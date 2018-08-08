@@ -222,7 +222,7 @@ export class SbxCoreService extends SbxCore {
    * @return {Observable}
    */
   insertRx(model: string, data: any, letNull?: Boolean): Observable<any> {
-    const body = this.queryBuilderToInsert(data, letNull).setModel(model).compile();
+    const body = this.upsert(model, data, letNull);
     const option = {headers: this.getHeadersJSON() };
     return this.httpClient.post(this.$p(this.urls.row), body, option).pipe(map(res => res as any));
   }
@@ -234,7 +234,7 @@ export class SbxCoreService extends SbxCore {
    * @return {Observable}
    */
   updateRx(model: string, data: any, letNull?: Boolean): Observable<any> {
-    const body = this.queryBuilderToInsert(data, letNull).setModel(model).compile();
+    const body = this.upsert(model, data, letNull);
     const option = {headers: this.getHeadersJSON() };
     return this.httpClient.post(this.$p(this.urls.update), body, option).pipe(map(res => res as any));
   }
