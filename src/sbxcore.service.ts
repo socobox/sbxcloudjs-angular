@@ -496,7 +496,7 @@ export class AngularFind extends Find {
                 }
               }
               if (toFetch.length) {
-                result = this.mapFetchesResult(result, toFetch);
+                result = this.core.mapFetchesResult(result, toFetch);
               }
             }
           });
@@ -522,17 +522,21 @@ export class AngularFind extends Find {
     const option = {headers: this.core.getHeadersJSON() };
     return this.core.httpClient.post<SbxResponse<T>>(this.url, this.query.compile(), option).pipe(
       map<SbxResponse<T>, SbxResponse<T> | any>(res => {
-        if (res.isAny()) {
+        if ( res instanceof SbxResponse  &&  res.isAny() ) {
           const newRest = res.toAny();
           if (toFetch.length && this.isFind) {
-            return this.mapFetchesResult(newRest, toFetch);
+            return this.core.mapFetchesResult(newRest, toFetch);
           }
           return newRest;
         }else {
-          if (!res.success) {
-            throw new Error(res.message);
+          if ( res instanceof SbxResponse) {
+            if (!res.success) {
+              throw new Error(res.message);
+            } else {
+              return res.results;
+            }
           } else {
-            return res.results;
+            return res;
           }
         }
     })

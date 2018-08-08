@@ -1,6 +1,6 @@
 {
   "name": "sbx",
-  "version": "3.0.3-beta",
+  "version": "3.0.4-beta",
   "description": "Sbx Core for Angular",
   "keywords": [
     "angular",
@@ -17,15 +17,15 @@
     "bundle-report": "webpack-bundle-analyzer dist/stats.json"
   },
   "author": {
-        "name": "Luis Guzman",
-        "email": "lgguzman890414@gmail.com"
-    },
-    "contributors": [
-        {
-            "name": "Alexander Taborda Acosta",
-            "email": "alextab93@gmail.com"
-        }
-    ],
+    "name": "Luis Guzman",
+    "email": "lgguzman890414@gmail.com"
+  },
+  "contributors": [
+    {
+      "name": "Alexander Taborda Acosta",
+      "email": "alextab93@gmail.com"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/sbxcloud/angular4library.git"
@@ -57,7 +57,7 @@
     "core-js": "^2.5.5",
     "ngx-cookie-service": "^1.0.7",
     "rxjs": "^6.1.0",
-    "sbxcorejs": "^1.1.1",
+    "sbxcorejs": "^1.4.0",
     "zone.js": "^0.8.26"
   }
 }
