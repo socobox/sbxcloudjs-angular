@@ -2,8 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SbxCoreService } from './sbxcore.service';
 import {HttpClientModule} from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import {SbxInterceptor} from './sbxinterceptor.interceptor';
+// import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 @NgModule({
   imports: [
@@ -11,10 +10,12 @@ import {SbxInterceptor} from './sbxinterceptor.interceptor';
     HttpClientModule,
   ],
   declarations: [],
-  providers: [{
-    provide: HTTP_INTERCEPTORS,
-    useClass: SbxInterceptor,
-    multi: true
-  }, SbxCoreService]
+  providers: [
+  //   {
+  //   provide: HTTP_INTERCEPTORS,
+  //   useClass: SbxInterceptor,
+  //   multi: true
+  // },
+    SbxCoreService]
 })
 export class SbxCoreModule { }

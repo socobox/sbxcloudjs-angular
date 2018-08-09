@@ -460,6 +460,7 @@ export class AngularFind extends Find {
 
   public loadAllRx (toFetch = []) {
       this.setPageSize(100);
+      this.setUrl(true);
       const query = this.query.compile();
       return this.thenRx().pipe(mergeMap<any, any>(response => {
           this.totalpages = (<any>response).total_pages;
