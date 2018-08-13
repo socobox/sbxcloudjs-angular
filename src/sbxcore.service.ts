@@ -4,14 +4,10 @@ import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import { Find, SbxCore } from 'sbxcorejs';
 
-
-
 @Injectable()
 export class SbxCoreService extends SbxCore {
 
-
   private headers: any;
-
 
   constructor(public httpClient: HttpClient) {
     super();
@@ -459,7 +455,7 @@ export class AngularFind extends Find {
    */
 
   public loadAllRx (toFetch = []) {
-      this.setPageSize(100);
+      this.setPageSize(350);
       this.setUrl(true);
       const query = this.query.compile();
       return this.thenRx().pipe(mergeMap<any, any>(response => {
