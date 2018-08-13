@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, ModuleWithProviders} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SbxCoreService } from './sbxcore.service';
 import {HttpClientModule} from '@angular/common/http';
@@ -9,13 +9,20 @@ import {HttpClientModule} from '@angular/common/http';
     CommonModule,
     HttpClientModule,
   ],
-  declarations: [],
-  providers: [
-  //   {
-  //   provide: HTTP_INTERCEPTORS,
-  //   useClass: SbxInterceptor,
-  //   multi: true
-  // },
-    SbxCoreService]
+  declarations: []
 })
-export class SbxCoreModule { }
+export class SbxCoreModule {
+  static forRoot(): ModuleWithProviders {
+    return {
+      ngModule: SbxCoreModule,
+      providers: [
+         //   {
+        //   provide: HTTP_INTERCEPTORS,
+        //   useClass: SbxInterceptor,
+        //   multi: true
+        // },
+        SbxCoreService
+      ]
+    };
+  }
+}
