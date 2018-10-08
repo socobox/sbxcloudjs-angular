@@ -493,7 +493,7 @@ export class AngularFind extends Find {
                 }
               }
               if (toFetch.length) {
-                result = this.core.mapFetchesResult(result, toFetch);
+                result = this.core.mapFetchesResult({results: result, fetched_results}, toFetch).results;
               }
             }
           });
