@@ -363,19 +363,21 @@ export class SbxCoreService extends SbxCore {
    *
    * @param {string} key
    * @param params
+   * @param {boolean} [test=false]
    * @return {Observable<any>}
    */
-  runRx(key: string, params: any): Observable<any> {
+  runRx(key: string, params: any, test: boolean = false): Observable<any> {
     const option = {headers: this.getHeadersJSON() };
-    return this.httpClient.post(this.$p(this.urls.cloudscript_run), { key: key, params: params }, option).pipe(map(res => res as any));
+    return this.httpClient.post(this.$p(this.urls.cloudscript_run), { key, params, test }, option).pipe(map(res => res as any));
   }
 
   /**
    * @param {string} key
    * @param params
+   * @param {boolean} [test=false]
    */
-  run(key: string, params: any) {
-    return this.runRx(key, params).toPromise();
+  run(key: string, params: any, test: boolean = false) {
+    return this.runRx(key, params, test).toPromise();
   }
 
 }
