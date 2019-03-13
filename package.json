@@ -1,6 +1,6 @@
 {
   "name": "sbx",
-  "version": "3.0.8",
+  "version": "3.1.0",
   "description": "Sbx Core for Angular",
   "keywords": [
     "angular",
@@ -37,7 +37,8 @@
     "@types/node": "~6.0.60",
     "renamer": "^0.6.1",
     "rimraf": "^2.5.4",
-    "rollup": "^0.58.2",
+    "rollup": "^0.56.1",
+    "rollup-plugin-node-resolve": "^3.0.3",
     "ts-node": "^3.2.2",
     "tslint": "~5.3.2",
     "typescript": "~2.7.2",
@@ -55,7 +56,6 @@
     "@angular/platform-browser": "^6.0.0",
     "@angular/platform-browser-dynamic": "^6.0.0",
     "core-js": "^2.5.5",
-    "ngx-cookie-service": "^1.0.7",
     "rxjs": "^6.1.0",
     "sbxcorejs": "^1.4.0",
     "zone.js": "^0.8.26"

@@ -1,3 +1,5 @@
+import resolve from 'rollup-plugin-node-resolve';
+
 const globals = {
   '@angular/core': 'ng.core',
   '@angular/common': 'ng.common',
@@ -5,7 +7,6 @@ const globals = {
   '@angular/common/http': 'ng.common.http',
   'sbx-querybuilder/index': 'QueryBuilder',
   'sbxcorejs': 'Find',
-  'ngx-cookie-service': 'ngxCookieService',
   'rxjs': 'rxjs',
   'rxjs/operators': 'rxjs.operators'
 };
@@ -13,10 +14,16 @@ const globals = {
 export default {
 	input: 'dist/src/index.js',
 	output: {
+    name: 'sbxangular',
 	  file: 'dist/bundles/sbx.umd.js',
     format: 'umd',
-    globals: globals,
-    name: 'sbxangular'
+    globals: globals
   },
-  external: Object.keys(globals)
+  external: Object.keys(globals),
+  plugins: [
+    resolve({
+      module: true,
+      main: true
+    })
+  ]
 }

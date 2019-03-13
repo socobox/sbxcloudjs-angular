@@ -1,21 +1,16 @@
-
 import {map} from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import {SbxCoreService} from '../sbxcore.service';
-import {CookieService} from 'ngx-cookie-service';
-import {Observable} from 'rxjs';
+import {Observable} from 'rxjs/internal/Observable';
 
 @Injectable()
 export class SbxSessionService {
 
-  constructor(private sbxCoreService: SbxCoreService, private cookieService: CookieService) {
+  constructor(private sbxCoreService: SbxCoreService) {
   }
 
   private static day = 86400000;
-  private daysToExpire = 30;
-  private cookieToken = 'token';
   private _user: User;
-
 
   public initialize(domain: number, appKey: string) {
     this.sbxCoreService.initialize(domain, appKey);
@@ -40,7 +35,7 @@ export class SbxSessionService {
   }
 
   islogged(): boolean {
-    this.loadCookieToken();
+    this.loadToken();
     if (this.getCurrentUser().token != null) {
       this.sbxCoreService.addHeaderAttr('Authorization', 'Bearer ' + this.getCurrentUser().token);
       return true;
@@ -53,13 +48,12 @@ export class SbxSessionService {
    * methods that uses cookies
    */
 
-  private loadCookieToken(): void {
-    this.getCurrentUser().token = this.cookieService.check(this.cookieToken) ? this.cookieService.get(this.cookieToken) : null;
+  private loadToken(): void {
+    this.getCurrentUser().token = window.localStorage.getItem('token');
   }
 
-  public updateCookieToken(token: string): void {
-    const today = new Date().getTime();
-    this.cookieService.set(this.cookieToken, token, new Date(today + this.daysToExpire * SbxSessionService.day));
+  public updateToken(token: string): void {
+    window.localStorage.setItem('token', token);
   }
 
   private updateUser(data: any) {
@@ -68,6 +62,7 @@ export class SbxSessionService {
     this.getCurrentUser().name = data.user.name;
     this.getCurrentUser().login = data.user.login;
     this.getCurrentUser().email = data.user.email;
+    this.updateToken(data.token);
     this.sbxCoreService.addHeaderAttr('Authorization', 'Bearer ' + data.token);
   }
 
@@ -79,7 +74,7 @@ export class SbxSessionService {
     return this.loginRx(login, password, domain).toPromise();
   }
 
-  loginRx(login: string, password: string, domain?: number) {
+  loginRx(login: string, password: string, domain?: number): Observable<any> {
     return this.sbxCoreService.loginRx(login, password, domain).pipe(
       map(data => {
         if ((<any>data).success) {
@@ -93,7 +88,7 @@ export class SbxSessionService {
     this.validateRx(token).toPromise();
   }
 
-  validateRx(token: string ) {
+  validateRx(token: string ): Observable<any> {
     return this.sbxCoreService.validateRx(token).pipe(
       map(data => {
         if ((<any>data).success) {
@@ -105,7 +100,7 @@ export class SbxSessionService {
   }
 
   logout(): void {
-    this.cookieService.delete(this.cookieToken);
+    window.localStorage.removeItem('token');
     this.sbxCoreService.removeHeaderAttr('Authorization');
     this._user = null;
   }
@@ -114,7 +109,7 @@ export class SbxSessionService {
     return this.signUpRx(login, email, name, password).toPromise();
   }
 
-  signUpRx(login: string, email: string, name: string, password: string) {
+  signUpRx(login: string, email: string, name: string, password: string): Observable<any> {
     return this.sbxCoreService.signUpRx(login, email, name, password).pipe(
       map(data => {
         if ((<any>data).success) {

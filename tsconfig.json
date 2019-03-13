@@ -24,9 +24,6 @@
       ,
       "sbx-querybuilder/*": [
         "node_modules/sbx-querybuilder/*"
-      ],
-      "ngx-cookie-service/*": [
-        "node_modules/ngx-cookie-service/*"
       ]
     },
 //    "rootDir": "src",
