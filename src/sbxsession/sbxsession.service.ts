@@ -54,6 +54,7 @@ export class SbxSessionService {
 
   public updateToken(token: string): void {
     window.localStorage.setItem('token', token);
+    this.islogged();
   }
 
   private updateUser(data: any) {
@@ -63,7 +64,6 @@ export class SbxSessionService {
     this.getCurrentUser().login = data.user.login;
     this.getCurrentUser().email = data.user.email;
     this.updateToken(data.token);
-    this.sbxCoreService.addHeaderAttr('Authorization', 'Bearer ' + data.token);
   }
 
   /**
